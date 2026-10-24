@@ -1,0 +1,44 @@
+/* =====================================================
+   Ventas - Estilos específicos
+   ===================================================== */
+
+.stats-grid--ventas {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 992px) {
+  .stats-grid--ventas {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-grid--ventas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card__icon--teal {
+  background: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+}
+
+.stat-card__hint--success {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.search-container--filters {
+  max-width: 280px;
+}
+
+.filters-group .btn-primary {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .filters-group .btn-primary {
+    margin-left: 0;
+    width: 100%;
+  }
+}

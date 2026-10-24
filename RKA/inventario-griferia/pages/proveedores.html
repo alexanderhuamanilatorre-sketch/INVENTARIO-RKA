@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Proveedores - RKA Sistema de Inventario</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <script>
+    try {
+      if (window.innerWidth > 768 && localStorage.getItem("rkal_sidebar_collapsed") === "1") {
+        document.documentElement.classList.add("rkal-sidebar-collapsed");
+      }
+      var rawUser = localStorage.getItem("rkal_inventory_v2::currentUser");
+      if (rawUser) {
+        var perms = (JSON.parse(rawUser) || {}).permisos || [];
+        var allow = [];
+        for (var i = 0; i < perms.length; i++) {
+          if (perms[i] && perms[i].puedeVer) allow.push(perms[i].codigo);
+        }
+        document.documentElement.setAttribute("data-rkal-allow", allow.join(" "));
+      }
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+</head>
+
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">R</div>
+        <span class="logo-text">RKA</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar/Expandir menú">
+        <i class="bi bi-chevron-left sidebar-toggle__icon"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+              <ul class="sidebar-nav__list">
+          <li class="sidebar-nav__item"><a href="./dashboard.html#dashboard" class="nav-link" data-section="dashboard"><i class="bi bi-grid-1x2-fill nav-link__icon"></i><span class="nav-link__label">Dashboard</span></a></li>
+          <li class="sidebar-nav__item"><a href="./productos.html#productos" class="nav-link" data-section="productos"><i class="bi bi-tag-fill nav-link__icon"></i><span class="nav-link__label">Productos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./inventario.html#inventario" class="nav-link" data-section="inventario"><i class="bi bi-box-seam-fill nav-link__icon"></i><span class="nav-link__label">Inventario</span></a></li>
+          <li class="sidebar-nav__item"><a href="./movimientos.html#movimientos" class="nav-link" data-section="movimientos"><i class="bi bi-arrow-left-right nav-link__icon"></i><span class="nav-link__label">Movimientos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./ventas.html#ventas" class="nav-link" data-section="ventas"><i class="bi bi-cart-fill nav-link__icon"></i><span class="nav-link__label">Ventas</span></a></li>
+          <li class="sidebar-nav__item"><a href="./proveedores.html#proveedores" class="nav-link is-active" data-section="proveedores"><i class="bi bi-truck nav-link__icon"></i><span class="nav-link__label">Proveedores</span></a></li>
+          <li class="sidebar-nav__item"><a href="./reportes.html#reportes" class="nav-link" data-section="reportes"><i class="bi bi-bar-chart-fill nav-link__icon"></i><span class="nav-link__label">Reportes</span></a></li>
+          <li class="sidebar-nav__item"><a href="./permisos.html#permisos" class="nav-link" data-section="configuracion.permisos"><i class="bi bi-shield-lock-fill nav-link__icon"></i><span class="nav-link__label">Permisos y accesos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./configuracion.html#configuracion" class="nav-link" data-section="configuracion"><i class="bi bi-gear-fill nav-link__icon"></i><span class="nav-link__label">Configuración</span></a></li>
+        </ul>
+    </nav>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" title="Abrir menú">
+          <i class="bi bi-list mobile-menu-toggle__icon"></i>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="notification-btn" title="Notificaciones">
+          <i class="bi bi-bell-fill notification-btn__icon"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="user-profile-wrapper">
+          <button class="user-profile" id="userProfileBtn" title="Menú de usuario">
+            <img src="https://ui-avatars.com/api/?name=Usuario&background=0D6EFD&color=fff" alt="Avatar" class="user-profile__avatar" id="userAvatar" />
+            <span class="user-profile__name" id="lblUserName">Administrador</span>
+            <i class="bi bi-chevron-down user-profile__chevron"></i>
+          </button>
+          <div class="user-profile__menu" id="userProfileMenu">
+            <div class="user-profile__menu-header">
+              <p class="user-profile__menu-name" id="lblUserNameMenu">Administrador</p>
+              <p class="user-profile__menu-email" id="lblUserEmail">usuario@example.invalid</p>
+            </div>
+            <div class="user-profile__menu-divider"></div>
+            <a href="./configuracion.html#configuracion" class="user-profile__menu-item"><i class="bi bi-gear"></i><span>Configuración</span></a>
+            <button class="user-profile__menu-item user-profile__menu-item--danger" id="btnLogout"><i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+      <section id="proveedores" class="content-section is-active">
+        <header class="section-header">
+          <div class="section-header__info">
+            <h1 class="section-title">Proveedores</h1>
+            <p class="section-subtitle">Registro y gestión de proveedores</p>
+          </div>
+          <div class="section-header__actions">
+            <button class="btn btn-primary" id="btnNuevoProveedor"><i class="bi bi-plus-lg"></i> Nuevo Proveedor</button>
+          </div>
+        </header>
+
+        <article class="card">
+          <div class="card-body p-0">
+            <div class="table-wrapper">
+              <table class="table table--proveedores">
+                <thead>
+                  <tr><th>Nombre</th><th>RUC</th><th>Contacto</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th class="text-center">Acciones</th></tr>
+                </thead>
+                <tbody id="proveedoresTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal" id="modalProveedor">
+    <div class="modal__dialog">
+      <header class="modal__header">
+        <h3 class="modal__title" id="modalProveedorTitulo">Nuevo Proveedor</h3>
+        <button class="modal__close" id="modalProveedorCerrar" title="Cerrar">&times;</button>
+      </header>
+      <form id="formProveedor">
+        <div class="modal__body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="inputNombreProveedor">Nombre</label>
+              <input type="text" class="form-control" id="inputNombreProveedor" name="nombre" placeholder="Nombre del proveedor" required data-type="string" />
+              <p class="form-feedback" data-feedback="nombre"></p>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputRucProveedor">RUC</label>
+              <input type="text" class="form-control" id="inputRucProveedor" name="ruc" placeholder="11 dígitos del RUC" maxlength="11" inputmode="numeric" autocomplete="off" required data-type="int" />
+              <p class="form-feedback"></p>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputContactoProveedor">Contacto</label>
+              <input type="text" class="form-control" id="inputContactoProveedor" name="contacto" placeholder="Nombre de contacto" data-type="string" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputTelefonoProveedor">Teléfono</label>
+              <input type="text" class="form-control" id="inputTelefonoProveedor" name="telefono" placeholder="Teléfono" data-type="phone" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputEmailProveedor">Email</label>
+              <input type="email" class="form-control" id="inputEmailProveedor" name="email" placeholder="correo@proveedor.com" data-type="email" />
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label" for="inputDireccionProveedor">Dirección</label>
+              <input type="text" class="form-control" id="inputDireccionProveedor" name="direccion" placeholder="Dirección" data-type="text" />
+            </div>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <button type="button" class="btn btn-outline" id="btnCancelarProveedor">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnGuardarProveedor"><span class="btn-text">Guardar</span><span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span></button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/modules/proveedores.js"></script>
+</body>
+
+</html>

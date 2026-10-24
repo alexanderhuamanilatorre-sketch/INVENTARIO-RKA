@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Permisos y accesos - RKA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <script>
+    try {
+      if (window.innerWidth > 768 && localStorage.getItem("rkal_sidebar_collapsed") === "1") {
+        document.documentElement.classList.add("rkal-sidebar-collapsed");
+      }
+      var rawUser = localStorage.getItem("rkal_inventory_v2::currentUser");
+      if (rawUser) {
+        var perms = (JSON.parse(rawUser) || {}).permisos || [];
+        var allow = [];
+        for (var i = 0; i < perms.length; i++) {
+          if (perms[i] && perms[i].puedeVer) allow.push(perms[i].codigo);
+        }
+        document.documentElement.setAttribute("data-rkal-allow", allow.join(" "));
+      }
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+  <link rel="stylesheet" href="../assets/css/permisos.css" />
+</head>
+
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">R</div>
+        <span class="logo-text">RKA</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar/Expandir menú">
+        <i class="bi bi-chevron-left sidebar-toggle__icon"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul class="sidebar-nav__list">
+        <li class="sidebar-nav__item"><a href="./dashboard.html#dashboard" class="nav-link" data-section="dashboard"><i
+              class="bi bi-grid-1x2-fill nav-link__icon"></i><span class="nav-link__label">Dashboard</span></a></li>
+        <li class="sidebar-nav__item"><a href="./productos.html#productos" class="nav-link" data-section="productos"><i
+              class="bi bi-tag-fill nav-link__icon"></i><span class="nav-link__label">Productos</span></a></li>
+        <li class="sidebar-nav__item"><a href="./inventario.html#inventario" class="nav-link"
+            data-section="inventario"><i class="bi bi-box-seam-fill nav-link__icon"></i><span
+              class="nav-link__label">Inventario</span></a></li>
+        <li class="sidebar-nav__item"><a href="./movimientos.html#movimientos" class="nav-link"
+            data-section="movimientos"><i class="bi bi-arrow-left-right nav-link__icon"></i><span
+              class="nav-link__label">Movimientos</span></a></li>
+        <li class="sidebar-nav__item"><a href="./ventas.html#ventas" class="nav-link" data-section="ventas"><i
+              class="bi bi-cart-fill nav-link__icon"></i><span class="nav-link__label">Ventas</span></a></li>
+        <li class="sidebar-nav__item"><a href="./proveedores.html#proveedores" class="nav-link"
+            data-section="proveedores"><i class="bi bi-truck nav-link__icon"></i><span
+              class="nav-link__label">Proveedores</span></a></li>
+        <li class="sidebar-nav__item"><a href="./reportes.html#reportes" class="nav-link" data-section="reportes"><i
+              class="bi bi-bar-chart-fill nav-link__icon"></i><span class="nav-link__label">Reportes</span></a></li>
+        <li class="sidebar-nav__item"><a href="./permisos.html#permisos" class="nav-link is-active"
+            data-section="configuracion.permisos"><i class="bi bi-shield-lock-fill nav-link__icon"></i><span
+              class="nav-link__label">Permisos y accesos</span></a></li>
+        <li class="sidebar-nav__item"><a href="./configuracion.html#configuracion" class="nav-link"
+            data-section="configuracion"><i class="bi bi-gear-fill nav-link__icon"></i><span
+              class="nav-link__label">Configuración</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" title="Abrir menú">
+          <i class="bi bi-list mobile-menu-toggle__icon"></i>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="notification-btn" title="Notificaciones">
+          <i class="bi bi-bell-fill notification-btn__icon"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="user-profile-wrapper">
+          <button class="user-profile" id="userProfileBtn" title="Menú de usuario">
+            <img src="https://ui-avatars.com/api/?name=Usuario&background=0D6EFD&color=fff" alt="Avatar"
+              class="user-profile__avatar" id="userAvatar" />
+            <span class="user-profile__name" id="lblUserName">Administrador</span>
+            <i class="bi bi-chevron-down user-profile__chevron"></i>
+          </button>
+          <div class="user-profile__menu" id="userProfileMenu">
+            <div class="user-profile__menu-header">
+              <p class="user-profile__menu-name" id="lblUserNameMenu">Administrador</p>
+              <p class="user-profile__menu-email" id="lblUserEmail">usuario@example.invalid</p>
+            </div>
+            <div class="user-profile__menu-divider"></div>
+            <a href="./configuracion.html#configuracion" class="user-profile__menu-item">
+              <i class="bi bi-gear"></i><span>Configuración</span>
+            </a>
+            <button class="user-profile__menu-item user-profile__menu-item--danger" id="btnLogout">
+              <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-wrapper rbac-page">
+      <section id="permisos" class="content-section is-active">
+        <header class="section-header rbac-header">
+          <div class="section-header__info">
+            <p class="rbac-breadcrumb">Configuración / Seguridad / Permisos y accesos</p>
+            <h1 class="section-title">Permisos y control de acceso</h1>
+            <p class="section-subtitle">
+              Define qué secciones puede ver y usar cada rol. Los cambios se aplican al guardar.
+            </p>
+          </div>
+          <div class="rbac-header__actions">
+            <span class="rbac-access-badge">
+              <i class="bi bi-shield-lock-fill"></i>
+              Solo Administrador y Jefe General
+            </span>
+            <button type="button" class="btn btn-outline btn-sm" id="btnHistorial">
+              <i class="bi bi-clock-history"></i> Historial
+            </button>
+          </div>
+        </header>
+
+        <div class="rbac-alert rbac-alert--info" id="rbacSoloLectura" hidden>
+          <i class="bi bi-info-circle-fill"></i>
+          <div>
+            <strong>Vista de solo lectura.</strong>
+            No puedes modificar los permisos de tu propio rol.
+          </div>
+        </div>
+
+        <article class="card rbac-role-card">
+          <div class="rbac-role-card__body">
+            <div class="rbac-role-card__selector">
+              <label class="form-label" for="selectRol">Rol a configurar</label>
+              <select class="select-control" id="selectRol"></select>
+              <p class="rbac-help">Solo se muestran roles distintos al tuyo.</p>
+            </div>
+
+            <div class="rbac-role-meta">
+              <div class="rbac-role-meta__item">
+                <span class="rbac-role-meta__label">Usuarios activos</span>
+                <strong id="metaUsuarios">—</strong>
+              </div>
+              <div class="rbac-role-meta__item">
+                <span class="rbac-role-meta__label">Estado</span>
+                <strong id="metaEstado">—</strong>
+              </div>
+              <div class="rbac-role-meta__item rbac-role-meta__item--wide">
+                <span class="rbac-role-meta__label">Última modificación</span>
+                <strong id="metaUltima">—</strong>
+              </div>
+            </div>
+
+            <div class="rbac-role-card__actions">
+              <button type="button" class="btn btn-outline btn-sm" id="btnNuevoRol">
+                <i class="bi bi-plus-lg"></i> Nuevo rol
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="btnEstadoRol" hidden>
+                <i class="bi bi-toggle-on"></i> <span id="txtEstadoRol">Activar rol</span>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <div class="rbac-toolbar">
+          <div class="rbac-toolbar__search">
+            <i class="bi bi-search"></i>
+            <input type="search" id="inputBuscar" class="form-control" placeholder="Buscar sección o código..."
+              autocomplete="off" />
+          </div>
+          <select class="select-control rbac-toolbar__filter" id="selectFiltro">
+            <option value="todos">Todas las secciones</option>
+            <option value="modulos">Solo módulos</option>
+            <option value="subsecciones">Solo subsecciones</option>
+            <option value="acceso">Con acceso</option>
+            <option value="sin-acceso">Sin acceso</option>
+            <option value="protegidas">Protegidas</option>
+          </select>
+          <div class="rbac-toolbar__actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnExpandir">
+              <i class="bi bi-arrows-expand"></i> Expandir
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnContraer">
+              <i class="bi bi-arrows-collapse"></i> Contraer
+            </button>
+            <div class="rbac-view-toggle" role="group" aria-label="Vista de permisos">
+              <button type="button" class="is-active" data-view="rol">Por rol</button>
+              <button type="button" data-view="matriz">Matriz</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rbac-alert rbac-alert--warning" id="rbacSinAccesos" hidden>
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>
+            <strong>Este rol no tiene ninguna sección activa.</strong>
+            Sus usuarios no podrán ingresar al sistema hasta que actives al menos una.
+          </div>
+        </div>
+
+        <article class="card rbac-table-card" id="vistaRol">
+          <div class="table-wrapper rbac-table-wrapper">
+            <table class="table rbac-table">
+              <thead>
+                <tr>
+                  <th class="rbac-col-seccion">Sección</th>
+                  <th class="rbac-col-switch">Visible en menú</th>
+                  <th class="rbac-col-switch">Acceso permitido</th>
+                  <th class="rbac-col-estado">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPermisos">
+                <tr>
+                  <td colspan="4" class="rbac-loading">
+                    <span class="rbac-spinner"></span> Cargando permisos...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card rbac-table-card" id="vistaMatriz" hidden>
+          <div class="table-wrapper rbac-matrix-wrapper">
+            <table class="table rbac-table rbac-matrix">
+              <thead id="matrizHead"></thead>
+              <tbody id="matrizBody"></tbody>
+            </table>
+          </div>
+          <div class="rbac-legend">
+            <span><i class="rbac-legend__icon rbac-legend__icon--full"></i> Visible + acceso</span>
+            <span><i class="rbac-legend__icon rbac-legend__icon--hidden"></i> Solo acceso</span>
+            <span><i class="rbac-legend__icon rbac-legend__icon--none"></i> Sin permiso</span>
+            <span><i class="bi bi-lock-fill"></i> Protegido</span>
+            <span><i class="bi bi-dash-lg"></i> Bloqueado por ancestro</span>
+          </div>
+        </article>
+
+        <div class="rbac-empty" id="rbacEmpty" hidden>
+          <i class="bi bi-person-gear"></i>
+          <h2>No hay otros roles para configurar</h2>
+          <p>Crea un rol nuevo o revisa la gestión de usuarios y roles.</p>
+          <button type="button" class="btn btn-primary" id="btnNuevoRolEmpty">
+            <i class="bi bi-plus-lg"></i> Nuevo rol
+          </button>
+        </div>
+
+        <div class="rbac-savebar" id="rbacSavebar" hidden>
+          <div class="rbac-savebar__info">
+            <span class="rbac-dirty-dot"></span>
+            <strong id="txtCambios">0 cambios sin guardar</strong>
+          </div>
+          <div class="rbac-savebar__actions">
+            <button type="button" class="btn btn-outline" id="btnDescartar">Descartar</button>
+            <button type="button" class="btn btn-primary" id="btnGuardar">
+              <i class="bi bi-check2-circle"></i> Guardar cambios
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Confirmación de guardado -->
+  <div class="rbac-modal" id="modalGuardar" hidden>
+    <div class="rbac-modal__backdrop" data-close="guardar"></div>
+    <div class="rbac-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="tituloModalGuardar">
+      <header class="rbac-modal__header">
+        <div>
+          <h2 id="tituloModalGuardar">Guardar cambios de permisos</h2>
+          <p class="rbac-modal__subtitle" id="subtituloModalGuardar"></p>
+        </div>
+        <button type="button" class="rbac-modal__close" data-close="guardar" aria-label="Cerrar">&times;</button>
+      </header>
+      <div class="rbac-modal__body">
+        <div class="rbac-impact" id="impactoGuardar"></div>
+        <div class="rbac-impact rbac-impact--danger" id="seccionesRevocadas" hidden></div>
+        <div class="form-group">
+          <label class="form-label" for="inputMotivo">Motivo del cambio (opcional)</label>
+          <textarea class="form-control" id="inputMotivo" rows="2" maxlength="300"
+            placeholder="Ej. Ajuste de accesos del turno tarde"></textarea>
+        </div>
+        <label class="checkbox-control rbac-confirm-check" id="wrapConfirmarRevocacion" hidden>
+          <input type="checkbox" id="chkConfirmarRevocacion" />
+          <span>Entiendo que los usuarios perderán acceso inmediatamente.</span>
+        </label>
+      </div>
+      <footer class="rbac-modal__footer">
+        <button type="button" class="btn btn-outline" data-close="guardar">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmarGuardar">
+          <span class="btn-text">Confirmar y aplicar</span>
+          <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Nuevo rol -->
+  <div class="rbac-modal" id="modalNuevoRol" hidden>
+    <div class="rbac-modal__backdrop" data-close="nuevo"></div>
+    <div class="rbac-modal__dialog rbac-modal__dialog--sm" role="dialog" aria-modal="true"
+      aria-labelledby="tituloModalNuevo">
+      <header class="rbac-modal__header">
+        <div>
+          <h2 id="tituloModalNuevo">Nuevo rol</h2>
+          <p class="rbac-modal__subtitle">Nace en borrador y sin accesos.</p>
+        </div>
+        <button type="button" class="rbac-modal__close" data-close="nuevo" aria-label="Cerrar">&times;</button>
+      </header>
+      <form id="formNuevoRol">
+        <div class="rbac-modal__body">
+          <div class="form-group">
+            <label class="form-label" for="inputNuevoNombre">Nombre visible *</label>
+            <input class="form-control" id="inputNuevoNombre" name="nombre" required maxlength="80"
+              placeholder="Ej. Supervisor de turno" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputNuevoCodigo">Código *</label>
+            <input class="form-control" id="inputNuevoCodigo" name="codigo" required maxlength="50"
+              placeholder="supervisor_turno" pattern="[a-z][a-z0-9_]{2,49}" />
+            <p class="rbac-help">Minúsculas, números y guion bajo. No se puede cambiar después.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputNuevaDescripcion">Descripción</label>
+            <input class="form-control" id="inputNuevaDescripcion" name="descripcion" maxlength="200"
+              placeholder="Propósito del rol" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="selectClonar">Clonar permisos de (opcional)</label>
+            <select class="select-control" id="selectClonar"></select>
+            <p class="rbac-help">No se copian permisos de Configuración ni secciones protegidas.</p>
+          </div>
+        </div>
+        <footer class="rbac-modal__footer">
+          <button type="button" class="btn btn-outline" data-close="nuevo">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnCrearRol">
+            <span class="btn-text">Crear rol</span>
+            <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+          </button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="rbac-modal rbac-modal--drawer" id="modalHistorial" hidden>
+    <div class="rbac-modal__backdrop" data-close="historial"></div>
+    <aside class="rbac-drawer" role="dialog" aria-modal="true" aria-labelledby="tituloHistorial">
+      <header class="rbac-drawer__header">
+        <div>
+          <h2 id="tituloHistorial">Historial de cambios</h2>
+          <p class="rbac-modal__subtitle" id="subtituloHistorial">Últimos cambios del rol seleccionado.</p>
+        </div>
+        <button type="button" class="rbac-modal__close" data-close="historial" aria-label="Cerrar">&times;</button>
+      </header>
+      <div class="rbac-drawer__body" id="listaHistorial">
+        <div class="rbac-loading"><span class="rbac-spinner"></span> Cargando historial...</div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module" src="../assets/js/modules/permisos.js"></script>
+</body>
+
+</html>

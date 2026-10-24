@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Iniciar Sesión - RKA Sistema de Inventario</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+</head>
+
+<body class="auth-body">
+  <main class="auth-main">
+    <section class="auth-left-panel">
+      <div class="auth-brand">
+        <div class="auth-logo">
+          <span class="auth-logo__symbol">R</span>
+          <span class="auth-logo__text">RKA</span>
+        </div>
+        <h1 class="auth-title">Sistema de Gestión de Inventario</h1>
+        <p class="auth-subtitle">
+          Control de stock, movimientos, productos y reportes para Grifería RKA.
+        </p>
+      </div>
+
+      <ul class="auth-features">
+        <li class="auth-feature-item"><i class="bi bi-box-seam-fill"></i><span>Gestión de inventario en tiempo real</span></li>
+        <li class="auth-feature-item"><i class="bi bi-arrow-left-right"></i><span>Control de entradas y salidas con trazabilidad</span></li>
+        <li class="auth-feature-item"><i class="bi bi-bar-chart-fill"></i><span>Reportes y alertas de stock bajo</span></li>
+        <li class="auth-feature-item"><i class="bi bi-shield-lock-fill"></i><span>Acceso seguro por usuario y contraseña</span></li>
+      </ul>
+
+      <footer class="auth-footer">
+        © <span id="authYear"></span> RKA - Sistema de Inventario
+      </footer>
+    </section>
+
+    <section class="auth-right-panel">
+      <div class="auth-card">
+        <header class="auth-card__header">
+          <h2 class="auth-card__title">Iniciar Sesión</h2>
+          <p class="auth-card__subtitle">Ingresa tus credenciales para acceder al sistema</p>
+        </header>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="inputUsuario">Correo Institucional o Usuario</label>
+            <div class="input-wrapper">
+              <i class="bi bi-person input-icon-left"></i>
+              <input
+                type="text"
+                id="inputUsuario"
+                name="usuario"
+                class="form-control"
+                placeholder="Usuario o correo"
+                autocomplete="username"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                required
+                aria-describedby="usuarioFeedback"
+                data-type="identifier"
+              />
+            </div>
+            <p class="form-feedback" id="usuarioFeedback" aria-live="polite"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="inputContrasena">Contraseña</label>
+            <div class="input-wrapper has-action">
+              <i class="bi bi-lock input-icon-left"></i>
+              <input
+                type="password"
+                id="inputContrasena"
+                name="contrasena"
+                class="form-control"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+                spellcheck="false"
+                required
+                aria-describedby="contrasenaFeedback"
+                data-type="password"
+              />
+              <button
+                type="button"
+                class="input-action-btn"
+                id="btnTogglePassword"
+                aria-label="Mostrar contraseña"
+                aria-pressed="false"
+              >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="form-feedback" id="contrasenaFeedback" aria-live="polite"></p>
+          </div>
+
+          <div class="auth-options">
+            <label class="checkbox-control">
+              <input type="checkbox" id="chkRecordarme" />
+              <span>Mantener sesión iniciada</span>
+            </label>
+            <a href="./recuperar-contrasena.html" class="auth-link">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="btnLogin">
+            <span class="btn-text">Iniciar Sesión</span>
+            <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+          </button>
+        </form>
+
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../assets/js/auth/login.js"></script>
+</body>
+
+</html>

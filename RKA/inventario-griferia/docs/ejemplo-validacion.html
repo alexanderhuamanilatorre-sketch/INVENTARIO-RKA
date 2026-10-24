@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejemplo - Validación en tiempo real | RKA</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+
+  <style>
+    .demo-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+    .demo-note { background: #f8f9fa; border: 1px solid var(--gray-200); border-radius: var(--border-radius-md); padding: 1rem 1.15rem; font-size: .9rem; line-height: 1.6; margin-bottom: 1.5rem; }
+    .demo-note code { background: #eef1f5; padding: .1rem .35rem; border-radius: 4px; font-size: .85em; }
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.15rem; }
+    .demo-result { margin-top: 1.5rem; padding: 1rem 1.15rem; border-radius: var(--border-radius-md); background: rgba(25, 135, 84, .08); color: #0f5132; border: 1px solid rgba(25, 135, 84, .25); font-size: .92rem; display: none; }
+    .demo-result.is-visible { display: block; }
+    .demo-rule { font-size: .75rem; font-weight: 600; color: var(--gray-600); margin-top: .35rem; }
+  </style>
+</head>
+<body>
+  <main class="demo-wrap">
+    <h1 style="font-size: 1.5rem; margin-bottom: .35rem;">Validación estricta en tiempo real</h1>
+    <p style="color: var(--gray-600); margin-bottom: 1.25rem;">
+      Demostración del módulo <strong>input-guard.js</strong> aplicado con los atributos
+      <code>data-type="string"</code>, <code>data-type="int"</code>, <code>data-type="double"</code>,
+      <code>data-type="email"</code> y <code>data-type="identifier"</code>.
+    </p>
+
+    <div class="demo-note">
+      <strong>Pruebe:</strong> intente escribir números o símbolos en <em>Nombres</em>,
+      letras en <em>Cantidad</em> o una coma decimal en <em>Precio</em> — el carácter se bloquea
+      al instante, el campo se marca en rojo y aparece el mensaje de alerta.
+      En <em>Usuario o Correo</em> sí puede escribir letras, números y símbolos (solo se bloquean
+      los espacios) y en <em>Correo</em> se escribe el correo completo letra a letra,
+      comprobando el formato <code>correo@dominio.com</code> al enviar.
+      El pegado de texto también se filtra automáticamente.
+      <br /><br />
+      Reglas:
+      <ul style="margin: .5rem 0 0 1.1rem;">
+        <li><code>data-type="string"</code> → solo letras (á, é, í, ó, ú, ñ, Ñ) y espacios simples.</li>
+        <li><code>data-type="int"</code> → solo dígitos enteros positivos (0-9).</li>
+        <li><code>data-type="double"</code> → solo dígitos y un único punto decimal.</li>
+        <li><code>data-type="identifier"</code> → usuario o correo institucional: letras, números y
+            símbolos (<code># $ ! - _ @ .</code>…); solo se bloquean espacios y caracteres de control.</li>
+        <li><code>data-type="email"</code> → letras, números y <code>@ . _ - + %</code>; se escribe
+            progresivamente y el formato completo se exige al enviar.</li>
+      </ul>
+    </div>
+
+    <form id="formDemo" novalidate>
+      <div class="demo-grid">
+        <div class="form-group">
+          <label class="form-label" for="demoNombres">Nombres (string)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoNombres"
+            name="nombres"
+            placeholder="Ej. Sergio Andrés"
+            data-type="string"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">Regex: <code>/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/</code></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="demoApellidos">Apellidos (string)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoApellidos"
+            name="apellidos"
+            placeholder="Ej. Rodríguez Vílchez"
+            data-type="string"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">Regex: <code>/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/</code></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="demoCantidad">Cantidad (int)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoCantidad"
+            name="cantidad"
+            placeholder="Ej. 25"
+            data-type="int"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">Regex: <code>/^[0-9]+$/</code></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="demoPrecio">Precio / Monto Total (double)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoPrecio"
+            name="precio"
+            placeholder="Ej. 149.90"
+            data-type="double"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">Regex: <code>/^[0-9]+(\.[0-9]+)?$/</code></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="demoIdentificador">Usuario o Correo (identifier)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoIdentificador"
+            name="identificador"
+            placeholder="Usuario o correo"
+            data-type="identifier"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">
+            Acepta todo (letras, números y símbolos) menos espacios:
+            <code>/[\s\x00-\x1F\x7F]+/g</code> se eliminan.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="demoEmail">Correo electrónico (email)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="demoEmail"
+            name="correo"
+            placeholder="Ej. ventas@ferrum.com"
+            data-type="email"
+            required
+          />
+          <p class="form-feedback"></p>
+          <p class="demo-rule">
+            Tecla a tecla <code>/^[A-Za-z0-9._%+\-@]+$/</code> · al enviar
+            <code>correo@dominio.com</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="reset" class="btn btn-outline">Limpiar</button>
+        <button type="submit" class="btn btn-primary">
+          <span class="btn-text">Guardar Registro</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="demo-result" id="demoResult"></div>
+  </main>
+
+  <!-- Guardián de validación: se auto-inicializa al importarse -->
+  <script type="module" src="../assets/js/core/input-guard.js"></script>
+
+  <script type="module">
+    const form = document.getElementById("formDemo");
+    const result = document.getElementById("demoResult");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      const incompletos = Object.entries(data).filter(([, v]) => !String(v).trim());
+
+      if (incompletos.length) {
+        result.classList.add("is-visible");
+        result.style.background = "rgba(220,53,69,.08)";
+        result.style.color = "#842029";
+        result.style.borderColor = "rgba(220,53,69,.25)";
+        result.innerHTML = "<strong>Campos obligatorios vacíos:</strong> " +
+          incompletos.map(([k]) => k).join(", ");
+        return;
+      }
+
+      result.classList.add("is-visible");
+      result.style.background = "rgba(25,135,84,.08)";
+      result.style.color = "#0f5132";
+      result.style.borderColor = "rgba(25,135,84,.25)";
+      result.innerHTML =
+        "<strong>Registro válido:</strong><br />" +
+        `Nombres: ${data.nombres}<br />` +
+        `Apellidos: ${data.apellidos}<br />` +
+        `Cantidad: ${data.cantidad}<br />` +
+        `Precio: S/ ${data.precio}<br />` +
+        `Usuario o Correo: ${data.identificador}<br />` +
+        `Correo: ${data.correo}`;
+    });
+  </script>
+</body>
+</html>

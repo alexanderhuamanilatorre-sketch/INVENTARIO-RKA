@@ -1,0 +1,236 @@
+/* =====================================================
+   Reportes - Estilos específicos
+   ===================================================== */
+
+/* Layout de 2 columnas: panel lateral + vista previa */
+.reportes-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .reportes-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panel lateral de tipos de reporte */
+.reportes-panel {
+  background: #ffffff;
+  border: 1px solid rgba(16, 24, 40, 0.04);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+}
+
+.reportes-panel__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.reportes-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reporte-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 1rem;
+  background: #ffffff;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--border-radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+}
+
+.reporte-card:hover {
+  border-color: var(--color-primary);
+  background: var(--gray-50);
+}
+
+.reporte-card--active {
+  border-color: #0d9488;
+  background: rgba(13, 148, 136, 0.05);
+}
+
+.reporte-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.reporte-card__icon--teal {
+  background: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+}
+
+.reporte-card__icon--blue {
+  background: rgba(13, 110, 253, 0.08);
+  color: var(--color-primary);
+}
+
+.reporte-card__icon--orange {
+  background: rgba(255, 193, 7, 0.12);
+  color: #f59e0b;
+}
+
+.reporte-card__icon--purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.reporte-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reporte-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+}
+
+.reporte-card__desc {
+  font-size: 0.8125rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+/* Vista previa */
+.reportes-preview__periodo {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-top: 0.25rem;
+}
+
+/* Gráfico */
+.reportes-chart {
+  margin-bottom: 2rem;
+}
+
+.reportes-chart__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+}
+
+.reportes-chart__container {
+  background: var(--gray-50);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  height: 280px;
+}
+
+.reportes-chart__container--donut {
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reportes-chart__container--donut canvas {
+  max-height: 280px;
+}
+
+/* Tabla de desglose */
+.reportes-table__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+}
+
+.reportes-table .table td:last-child {
+  font-weight: 700;
+  color: #0d9488;
+}
+
+/* Filtros inline */
+.form-group--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group--inline .form-label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.form-group--inline .form-control,
+.form-group--inline .select-control {
+  width: auto;
+  min-width: 140px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .filters-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .filters-actions .btn {
+    flex: 1;
+  }
+}
+
+/* Botón oscuro */
+.btn-dark {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.btn-dark:hover:not(:disabled) {
+  background: #0f172a;
+}
+
+/* KPIs de inventario */
+.stats-grid--inventario {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 992px) {
+  .stats-grid--inventario {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-grid--inventario {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Vistas de reporte */
+.reporte-vista {
+  display: none;
+}
+
+.reporte-vista.is-active {
+  display: flex;
+}

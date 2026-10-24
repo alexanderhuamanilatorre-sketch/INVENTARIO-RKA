@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Acceso no autorizado - RKA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/variables.css" />
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/utilities.css" />
+    <link rel="stylesheet" href="../assets/css/permisos.css" />
+  </head>
+
+  <body class="rbac-error-body">
+    <main class="rbac-error" role="main">
+      <div class="rbac-error__icon" aria-hidden="true">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <p class="rbac-error__code">Error 403</p>
+      <h1 class="rbac-error__title">Acceso no autorizado</h1>
+      <p class="rbac-error__message" id="rbacErrorMessage">
+        Tu rol no tiene permiso para acceder a esta sección.
+      </p>
+      <p class="rbac-error__detail" id="rbacErrorDetail"></p>
+
+      <div class="rbac-error__actions">
+        <button type="button" class="btn btn-primary" id="btnIrPanel">
+          <i class="bi bi-house-door"></i> Ir a mi panel
+        </button>
+        <button type="button" class="btn btn-outline" id="btnSolicitarAcceso">
+          <i class="bi bi-envelope-paper"></i> Solicitar acceso
+        </button>
+      </div>
+
+      <a class="rbac-error__login" href="../auth/login.html" id="linkLogin" hidden>
+        Iniciar sesión con otra cuenta
+      </a>
+    </main>
+
+    <script type="module">
+      import { AuthService } from "../assets/js/auth/auth-core.js";
+      import { NotificationModal } from "../assets/js/core/notifications.js";
+
+      const auth = new AuthService();
+      const params = new URLSearchParams(window.location.search);
+      const seccion = params.get("seccion");
+      const motivo = params.get("motivo");
+
+      const mensaje = document.getElementById("rbacErrorMessage");
+      const detalle = document.getElementById("rbacErrorDetail");
+      const btnIrPanel = document.getElementById("btnIrPanel");
+      const btnSolicitar = document.getElementById("btnSolicitarAcceso");
+      const linkLogin = document.getElementById("linkLogin");
+
+      const user = auth.getCurrentUser();
+
+      if (motivo === "sin-accesos") {
+        mensaje.textContent =
+          "Tu rol todavía no tiene secciones habilitadas. Contacta al Administrador o al Jefe General.";
+      } else if (seccion) {
+        mensaje.textContent = `Tu rol${user?.rol ? ` (${user.rol})` : ""} no tiene permiso para acceder a esta sección.`;
+      }
+
+      if (seccion) detalle.textContent = `Código: 403 · Sección: ${seccion}`;
+
+      btnIrPanel?.addEventListener("click", async () => {
+        const fresco = await auth.refreshSession();
+        const inicio = fresco?.inicio;
+        if (inicio) {
+          window.location.replace(`../${inicio.replace(/^\/+/, "")}`);
+        } else if (fresco) {
+          window.location.replace("../pages/403.html?motivo=sin-accesos");
+        } else {
+          window.location.replace("../auth/login.html");
+        }
+      });
+
+      btnSolicitar?.addEventListener("click", () => {
+        const rol = user?.rol || "mi rol";
+        NotificationModal.info(
+          `Solicitud registrada para ${rol}${seccion ? ` · ${seccion}` : ""}. El Administrador revisará el acceso.`
+        );
+      });
+
+      if (!user) {
+        linkLogin.hidden = false;
+        btnSolicitar.hidden = true;
+      }
+    </script>
+  </body>
+</html>

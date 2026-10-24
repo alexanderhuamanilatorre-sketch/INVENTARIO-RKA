@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Recuperar Contraseña - RKA Sistema de Inventario</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/utilities.css" />
+  <link rel="stylesheet" href="../assets/css/auth.css" />
+</head>
+
+<body class="auth-body">
+  <main class="auth-main auth-main--single">
+    <div class="auth-card auth-card--wide">
+      <header class="auth-card__header">
+        <div class="auth-back-wrapper">
+          <a href="./login.html" class="auth-back-link"><i class="bi bi-arrow-left"></i> Volver a Iniciar Sesión</a>
+        </div>
+        <h2 class="auth-card__title">Recuperar Contraseña</h2>
+        <p class="auth-card__subtitle">Sigue los pasos para restablecer tu contraseña</p>
+      </header>
+
+      <ol class="auth-stepper" id="recoveryStepper">
+        <li class="auth-stepper__item active" data-step="1"><span class="auth-stepper__index">1</span><span class="auth-stepper__label">Buscar cuenta</span></li>
+        <li class="auth-stepper__item" data-step="2"><span class="auth-stepper__index">2</span><span class="auth-stepper__label">Verificar identidad</span></li>
+        <li class="auth-stepper__item" data-step="3"><span class="auth-stepper__index">3</span><span class="auth-stepper__label">Nueva contraseña</span></li>
+      </ol>
+
+      <section class="auth-step" id="stepBuscarCuenta">
+        <form id="formBuscarCuenta" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="inputBuscarCuenta">Usuario o Correo electrónico</label>
+            <div class="input-wrapper">
+              <i class="bi bi-person input-icon-left"></i>
+              <input type="text" class="form-control" id="inputBuscarCuenta" name="identificador" placeholder="Ingresa tu usuario o correo electrónico" required data-type="identifier" />
+            </div>
+            <p class="form-feedback" data-feedback="identificador"></p>
+          </div>
+          <div class="alert alert-danger d-none" id="alertBuscarCuenta"></div>
+          <div class="auth-actions-end">
+            <button type="submit" class="btn btn-primary" id="btnBuscarCuenta">
+              <span class="btn-text">Buscar cuenta</span>
+              <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="auth-step d-none" id="stepVerificarIdentidad">
+        <div class="auth-info-box">
+          <i class="bi bi-shield-check"></i>
+          <div>
+            <p class="auth-info-box__title">Cuenta encontrada</p>
+            <p class="auth-info-box__text">Usuario: <strong id="lblUsuarioRecuperacion">-</strong> | Correo: <strong id="lblCorreoRecuperacion">-</strong></p>
+          </div>
+        </div>
+        <form id="formVerificarIdentidad" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="lblPreguntaSeguridad">Pregunta de seguridad</label>
+            <input type="text" id="lblPreguntaSeguridad" class="form-control" readonly disabled />
+          </div>
+          <div class="form-group">
+            <label for="inputRespuestaSeguridad">Respuesta de seguridad</label>
+            <div class="input-wrapper">
+              <i class="bi bi-key input-icon-left"></i>
+              <input type="text" id="inputRespuestaSeguridad" class="form-control" name="respuesta" placeholder="Escribe la respuesta" required data-type="text" />
+            </div>
+            <p class="form-feedback" data-feedback="respuesta"></p>
+          </div>
+          <div class="alert alert-danger d-none" id="alertVerificarIdentidad"></div>
+          <div class="auth-actions-between">
+            <button type="button" class="btn btn-outline" id="btnVolverPaso1"><i class="bi bi-arrow-left"></i> Volver</button>
+            <button type="submit" class="btn btn-primary" id="btnVerificarIdentidad">
+              <span class="btn-text">Verificar identidad</span>
+              <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="auth-step d-none" id="stepNuevaContrasena">
+        <div class="auth-info-box auth-info-box--success">
+          <i class="bi bi-check-circle-fill"></i>
+          <div>
+            <p class="auth-info-box__title">Identidad verificada</p>
+            <p class="auth-info-box__text">Ahora puedes establecer una nueva contraseña</p>
+          </div>
+        </div>
+        <form id="formNuevaContrasena" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="inputNuevaContrasena">Nueva contraseña</label>
+            <div class="input-wrapper has-action">
+              <i class="bi bi-lock input-icon-left"></i>
+              <input type="password" id="inputNuevaContrasena" class="form-control" name="nuevaContrasena" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required data-type="password" />
+              <button type="button" class="input-action-btn" id="btnToggleNuevaPass" title="Mostrar u ocultar contraseña" aria-pressed="false"><i class="bi bi-eye"></i></button>
+            </div>
+            <p class="form-feedback" data-feedback="nuevaContrasena"></p>
+          </div>
+          <div class="form-group">
+            <label for="inputConfirmarContrasena">Confirmar nueva contraseña</label>
+            <div class="input-wrapper has-action">
+              <i class="bi bi-lock-fill input-icon-left"></i>
+              <input type="password" id="inputConfirmarContrasena" class="form-control" name="confirmarContrasena" placeholder="Repite la contraseña" autocomplete="new-password" required data-type="password" />
+              <button type="button" class="input-action-btn" id="btnToggleConfirmPass" title="Mostrar u ocultar contraseña" aria-pressed="false"><i class="bi bi-eye"></i></button>
+            </div>
+            <p class="form-feedback" data-feedback="confirmarContrasena"></p>
+          </div>
+          <div class="alert alert-success d-none" id="alertExitoRecuperacion">Contraseña restablecida correctamente. Redirigiendo...</div>
+          <div class="alert alert-danger d-none" id="alertNuevaContrasena"></div>
+          <div class="auth-actions-between">
+            <button type="button" class="btn btn-outline" id="btnVolverPaso2"><i class="bi bi-arrow-left"></i> Volver</button>
+            <button type="submit" class="btn btn-primary" id="btnRestablecerContrasena">
+              <span class="btn-text">Restablecer contraseña</span>
+              <span class="btn-spinner d-none"><i class="bi bi-arrow-repeat spin"></i></span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../assets/js/auth/recuperar-contrasena.js"></script>
+</body>
+
+</html>

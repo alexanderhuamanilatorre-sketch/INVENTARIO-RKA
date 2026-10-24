@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Configuración - RKA Sistema de Inventario</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <link rel="stylesheet" href="../assets/css/variables.css" />
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <script>
+      try {
+        if (window.innerWidth > 768 && localStorage.getItem("rkal_sidebar_collapsed") === "1") {
+          document.documentElement.classList.add("rkal-sidebar-collapsed");
+        }
+        var rawUser = localStorage.getItem("rkal_inventory_v2::currentUser");
+        if (rawUser) {
+          var perms = (JSON.parse(rawUser) || {}).permisos || [];
+          var allow = [];
+          for (var i = 0; i < perms.length; i++) {
+            if (perms[i] && perms[i].puedeVer) allow.push(perms[i].codigo);
+          }
+          document.documentElement.setAttribute("data-rkal-allow", allow.join(" "));
+        }
+      } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/utilities.css" />
+  </head>
+
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">R</div>
+          <span class="logo-text">RKA</span>
+        </div>
+        <button
+          class="sidebar-toggle"
+          id="sidebarToggle"
+          title="Colapsar/Expandir menú"
+        >
+          <i class="bi bi-chevron-left sidebar-toggle__icon"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+                <ul class="sidebar-nav__list">
+          <li class="sidebar-nav__item"><a href="./dashboard.html#dashboard" class="nav-link" data-section="dashboard"><i class="bi bi-grid-1x2-fill nav-link__icon"></i><span class="nav-link__label">Dashboard</span></a></li>
+          <li class="sidebar-nav__item"><a href="./productos.html#productos" class="nav-link" data-section="productos"><i class="bi bi-tag-fill nav-link__icon"></i><span class="nav-link__label">Productos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./inventario.html#inventario" class="nav-link" data-section="inventario"><i class="bi bi-box-seam-fill nav-link__icon"></i><span class="nav-link__label">Inventario</span></a></li>
+          <li class="sidebar-nav__item"><a href="./movimientos.html#movimientos" class="nav-link" data-section="movimientos"><i class="bi bi-arrow-left-right nav-link__icon"></i><span class="nav-link__label">Movimientos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./ventas.html#ventas" class="nav-link" data-section="ventas"><i class="bi bi-cart-fill nav-link__icon"></i><span class="nav-link__label">Ventas</span></a></li>
+          <li class="sidebar-nav__item"><a href="./proveedores.html#proveedores" class="nav-link" data-section="proveedores"><i class="bi bi-truck nav-link__icon"></i><span class="nav-link__label">Proveedores</span></a></li>
+          <li class="sidebar-nav__item"><a href="./reportes.html#reportes" class="nav-link" data-section="reportes"><i class="bi bi-bar-chart-fill nav-link__icon"></i><span class="nav-link__label">Reportes</span></a></li>
+          <li class="sidebar-nav__item"><a href="./permisos.html#permisos" class="nav-link" data-section="configuracion.permisos"><i class="bi bi-shield-lock-fill nav-link__icon"></i><span class="nav-link__label">Permisos y accesos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./configuracion.html#configuracion" class="nav-link is-active" data-section="configuracion"><i class="bi bi-gear-fill nav-link__icon"></i><span class="nav-link__label">Configuración</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button
+            class="mobile-menu-toggle"
+            id="mobileMenuToggle"
+            title="Abrir menú"
+          >
+            <i class="bi bi-list mobile-menu-toggle__icon"></i>
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button class="notification-btn" title="Notificaciones">
+            <i class="bi bi-bell-fill notification-btn__icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile-wrapper">
+            <button
+              class="user-profile"
+              id="userProfileBtn"
+              title="Menú de usuario"
+            >
+              <img
+                src="https://ui-avatars.com/api/?name=Usuario&background=0D6EFD&color=fff"
+                alt="Avatar"
+                class="user-profile__avatar"
+                id="userAvatar"
+              />
+              <span class="user-profile__name" id="lblUserName"
+                >Administrador</span
+              >
+              <i class="bi bi-chevron-down user-profile__chevron"></i>
+            </button>
+            <div class="user-profile__menu" id="userProfileMenu">
+              <div class="user-profile__menu-header">
+                <p class="user-profile__menu-name" id="lblUserNameMenu">
+                  Administrador
+                </p>
+                <p class="user-profile__menu-email" id="lblUserEmail">
+                  usuario@example.invalid
+                </p>
+              </div>
+              <div class="user-profile__menu-divider"></div>
+              <a
+                href="./configuracion.html#configuracion"
+                class="user-profile__menu-item"
+                ><i class="bi bi-gear"></i><span>Configuración</span></a
+              >
+              <button
+                class="user-profile__menu-item user-profile__menu-item--danger"
+                id="btnLogout"
+              >
+                <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <section id="configuracion" class="content-section is-active">
+          <header class="section-header">
+            <div class="section-header__info">
+              <h1 class="section-title">Configuración del Sistema</h1>
+              <p class="section-subtitle">
+                Administración de parámetros operativos, usuarios y sucursales
+                de RKA
+              </p>
+            </div>
+          </header>
+
+          <div class="config-grid">
+            <div class="config-grid__left">
+              <article class="card">
+                <header class="card-header">
+                  <h3 class="card-header__title">Datos de la Empresa</h3>
+                </header>
+                <div class="card-body">
+                  <form id="empresaForm">
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label class="form-label" for="inputNombreEmpresa"
+                          >Razón Social</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputNombreEmpresa"
+                          name="nombreEmpresa"
+                          value="RKA - COMERCIO"
+                        data-type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="inputRuc"
+                          >RUC</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputRuc"
+                          name="ruc"
+                          placeholder="901.345.882-1"
+                        data-type="int" />
+                      </div>
+                      <div class="form-group form-group--full">
+                        <label class="form-label" for="inputDireccionEmpresa"
+                          >Dirección Comercial</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputDireccionEmpresa"
+                          name="direccion"
+                          placeholder="Calle 45 # 12-34 Almacén Central"
+                        data-type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="inputTelefonoEmpresa"
+                          >Teléfono de Contacto</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputTelefonoEmpresa"
+                          name="telefono"
+                          placeholder="+51 498-294-342"
+                        data-type="phone" />
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </article>
+
+              <article class="card">
+                <header class="card-header">
+                  <h3 class="card-header__title">
+                    Parámetros Generales del Sistema
+                  </h3>
+                </header>
+                <div class="card-body">
+                  <form id="parametrosForm">
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label class="form-label" for="inputMonedaBase"
+                          >Moneda Base</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputMonedaBase"
+                          name="monedaBase"
+                          value="PEN (S/.) - Sol Peruano"
+                        data-type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="inputIva"
+                          >Impuesto IVA (%)</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputIva"
+                          name="iva"
+                          value="18 %"
+                        data-type="double" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="inputStockMinimoGlobal"
+                          >Stock Mínimo Alerta (Defecto)</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputStockMinimoGlobal"
+                          name="stockMinimoGlobal"
+                          value="20 unidades"
+                        data-type="int" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="inputFormatoSku"
+                          >Formato Código SKU</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputFormatoSku"
+                          name="formatoSku"
+                          value="RKA-[000]"
+                        data-type="code" />
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </article>
+            </div>
+
+            <div class="config-grid__right">
+              <article class="card">
+                <header class="card-header">
+                  <h3 class="card-header__title">
+                    Gestión de Usuarios / Roles
+                  </h3>
+                  <button class="btn btn-primary btn-sm" id="btnNuevoUsuario">
+                    + Nuevo Usuario
+                  </button>
+                </header>
+                <div class="card-body p-0">
+                  <div class="table-wrapper">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Colaborador</th>
+                          <th>Rol</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody id="usuariosTableBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <article class="card config-footer">
+            <div class="card-body config-footer__body">
+              <p class="config-footer__note">
+                * Todos los cambios guardados afectarán al almacén y las cajas
+                activas de inmediato.
+              </p>
+              <button class="btn btn-primary" id="btnGuardarCambios">
+                Guardar Cambios del Sistema
+              </button>
+            </div>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <div class="modal" id="modalUsuario">
+      <div class="modal__dialog">
+        <header class="modal__header">
+          <h3 class="modal__title" id="modalUsuarioTitulo">Nuevo Usuario</h3>
+          <button class="modal__close" id="modalUsuarioCerrar" title="Cerrar">
+            &times;
+          </button>
+        </header>
+        <form id="formUsuario">
+          <div class="modal__body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="selectTipoDocumento"
+                  >Tipo de Documento</label
+                >
+                <select
+                  class="select-control"
+                  id="selectTipoDocumento"
+                  name="tipoDocumento"
+                  required
+                >
+                  <option value="dni">DNI</option>
+                  <option value="ce">CE</option>
+                  <option value="ruc">RUC</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputNumDocumento"
+                  >Número de Documento</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputNumDocumento"
+                  name="numDocumento"
+                  placeholder="8 dígitos del documento"
+                  inputmode="numeric"
+                  maxlength="8"
+                  required
+                data-type="int" />
+                <p class="form-feedback" data-feedback="numDocumento"></p>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputNombres">Nombres</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputNombres"
+                  name="nombres"
+                  placeholder="Nombres"
+                  required
+                data-type="string" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputApellidos">Apellidos</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputApellidos"
+                  name="apellidos"
+                  placeholder="Apellidos"
+                  required
+                data-type="string" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputNacionalidad"
+                  >Nacionalidad</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputNacionalidad"
+                  name="nacionalidad"
+                  placeholder="Nacionalidad"
+                data-type="string" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="selectRolUsuario">Rol</label>
+                <select
+                  class="select-control"
+                  id="selectRolUsuario"
+                  name="rol"
+                  required
+                >
+                  <option value="Jefe General">Jefe General</option>
+                  <option value="Jefa de Tienda">Jefa de Tienda</option>
+                  <option value="Subjefe de Tienda">Subjefe de Tienda</option>
+                  <option value="Personal de Almacén">
+                    Personal de Almacén
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputEmailUsuario">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="inputEmailUsuario"
+                  name="email"
+                  placeholder="Se genera automáticamente"
+                  readonly
+                data-type="email" />
+              </div>
+              <div class="form-group form-group--full" id="grupoPreguntaSeguridad">
+                <label class="form-label" for="inputPreguntaSeguridad"
+                  >Pregunta de seguridad</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputPreguntaSeguridad"
+                  name="preguntaSeguridad"
+                  list="listaPreguntasSeguridad"
+                  placeholder="Elige o escribe una pregunta"
+                  maxlength="200"
+                  autocomplete="off"
+                />
+                <datalist id="listaPreguntasSeguridad">
+                  <option value="¿Cuál es el nombre de tu primera mascota?"></option>
+                  <option value="¿Cuál es el nombre de tu ciudad natal?"></option>
+                  <option value="¿Cuál es el nombre de tu escuela primaria?"></option>
+                  <option value="¿Cuál es tu comida favorita?"></option>
+                  <option value="¿Cuál es el nombre de tu mejor amigo de la infancia?"></option>
+                </datalist>
+                <p class="form-hint">
+                  Se usará para recuperar la contraseña desde el inicio de sesión.
+                </p>
+              </div>
+              <div class="form-group form-group--full" id="grupoRespuestaSeguridad">
+                <label class="form-label" for="inputRespuestaSeguridad"
+                  >Respuesta de seguridad</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputRespuestaSeguridad"
+                  name="respuestaSeguridad"
+                  placeholder="Escribe la respuesta"
+                  maxlength="200"
+                  autocomplete="off"
+                  data-type="text"
+                />
+                <p class="form-hint">
+                  Se usará para recuperar la contraseña desde el inicio de sesión.
+                </p>
+              </div>
+              <div class="form-group form-group--full">
+                <label class="form-label" for="inputPasswordGenerada"
+                  >Contraseña Generada</label
+                >
+                <div class="password-generated">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="inputPasswordGenerada"
+                    name="passwordGenerada"
+                    placeholder="Se genera automáticamente"
+                    readonly
+                  data-type="code" />
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    id="btnCopiarPassword"
+                    title="Copiar contraseña"
+                  >
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+                <p class="form-hint">
+                  Formato: <code>apellido.nombre_año</code>
+                </p>
+              </div>
+            </div>
+          </div>
+          <footer class="modal__footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="btnCancelarUsuario"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <span class="btn-text">Crear Usuario</span>
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Detalle del Usuario (card centrada) -->
+    <div class="modal" id="modalDetalleUsuario">
+      <div class="modal__dialog modal__dialog--detalle">
+        <header class="modal__header">
+          <h3 class="modal__title">Detalle del Colaborador</h3>
+          <button class="modal__close" id="modalDetalleCerrar" title="Cerrar">
+            &times;
+          </button>
+        </header>
+        <div class="modal__body">
+          <div class="user-detail__hero">
+            <div class="user-detail__avatar" id="detalleAvatar">R</div>
+            <div class="user-detail__hero-info">
+              <h4 class="user-detail__nombre" id="detalleNombre">—</h4>
+              <p class="user-detail__email" id="detalleEmail">—</p>
+            </div>
+            <span class="badge badge--success" id="detalleEstado">Activo</span>
+          </div>
+
+          <div class="user-detail__grid">
+            <div class="user-detail__item">
+              <span class="user-detail__label">Tipo de Documento</span>
+              <strong class="user-detail__value" id="detalleTipoDoc">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Número de Documento</span>
+              <strong class="user-detail__value" id="detalleNumDoc">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Nombres</span>
+              <strong class="user-detail__value" id="detalleNombres">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Apellidos</span>
+              <strong class="user-detail__value" id="detalleApellidos">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Nacionalidad</span>
+              <strong class="user-detail__value" id="detalleNacionalidad">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Rol</span>
+              <strong class="user-detail__value" id="detalleRol">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Usuario de Acceso</span>
+              <strong class="user-detail__value" id="detalleUsuario">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Contraseña</span>
+              <strong class="user-detail__value user-detail__value--pass" id="detallePassword">—</strong>
+            </div>
+            <div class="user-detail__item user-detail__item--full">
+              <span class="user-detail__label">Correo Institucional</span>
+              <strong class="user-detail__value" id="detalleCorreo">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Fecha de Registro</span>
+              <strong class="user-detail__value" id="detalleFecha">—</strong>
+            </div>
+            <div class="user-detail__item">
+              <span class="user-detail__label">Último Acceso</span>
+              <strong class="user-detail__value" id="detalleUltimoAcceso">—</strong>
+            </div>
+          </div>
+        </div>
+        <footer class="modal__footer modal__footer--detalle">
+          <div class="modal__footer-actions">
+            <button type="button" class="btn btn-danger-soft" id="btnEliminarUsuario">
+              <i class="bi bi-trash3"></i> Eliminar
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="btnEditarUsuario">
+              <i class="bi bi-pencil-square"></i> Editar
+            </button>
+            <button type="button" class="btn btn-primary" id="btnCopiarCredenciales">
+              <i class="bi bi-clipboard-check"></i> Copiar Credenciales
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script type="module" src="../assets/js/modules/configuracion.js"></script>
+  </body>
+</html>

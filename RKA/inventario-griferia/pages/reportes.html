@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Reportes - RKA Sistema de Inventario</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="../assets/css/variables.css" />
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <script>
+      try {
+        if (window.innerWidth > 768 && localStorage.getItem("rkal_sidebar_collapsed") === "1") {
+          document.documentElement.classList.add("rkal-sidebar-collapsed");
+        }
+        var rawUser = localStorage.getItem("rkal_inventory_v2::currentUser");
+        if (rawUser) {
+          var perms = (JSON.parse(rawUser) || {}).permisos || [];
+          var allow = [];
+          for (var i = 0; i < perms.length; i++) {
+            if (perms[i] && perms[i].puedeVer) allow.push(perms[i].codigo);
+          }
+          document.documentElement.setAttribute("data-rkal-allow", allow.join(" "));
+        }
+      } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/utilities.css" />
+    <link rel="stylesheet" href="../assets/css/reportes.css" />
+  </head>
+
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">R</div>
+          <span class="logo-text">RKA</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar/Expandir menú">
+          <i class="bi bi-chevron-left sidebar-toggle__icon"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul class="sidebar-nav__list">
+          <li class="sidebar-nav__item"><a href="./dashboard.html#dashboard" class="nav-link" data-section="dashboard"><i class="bi bi-grid-1x2-fill nav-link__icon"></i><span class="nav-link__label">Dashboard</span></a></li>
+          <li class="sidebar-nav__item"><a href="./productos.html#productos" class="nav-link" data-section="productos"><i class="bi bi-tag-fill nav-link__icon"></i><span class="nav-link__label">Productos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./inventario.html#inventario" class="nav-link" data-section="inventario"><i class="bi bi-box-seam-fill nav-link__icon"></i><span class="nav-link__label">Inventario</span></a></li>
+          <li class="sidebar-nav__item"><a href="./movimientos.html#movimientos" class="nav-link" data-section="movimientos"><i class="bi bi-arrow-left-right nav-link__icon"></i><span class="nav-link__label">Movimientos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./ventas.html#ventas" class="nav-link" data-section="ventas"><i class="bi bi-cart-fill nav-link__icon"></i><span class="nav-link__label">Ventas</span></a></li>
+          <li class="sidebar-nav__item"><a href="./proveedores.html#proveedores" class="nav-link" data-section="proveedores"><i class="bi bi-truck nav-link__icon"></i><span class="nav-link__label">Proveedores</span></a></li>
+          <li class="sidebar-nav__item"><a href="./reportes.html#reportes" class="nav-link is-active" data-section="reportes"><i class="bi bi-bar-chart-fill nav-link__icon"></i><span class="nav-link__label">Reportes</span></a></li>
+          <li class="sidebar-nav__item"><a href="./permisos.html#permisos" class="nav-link" data-section="configuracion.permisos"><i class="bi bi-shield-lock-fill nav-link__icon"></i><span class="nav-link__label">Permisos y accesos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./configuracion.html#configuracion" class="nav-link" data-section="configuracion"><i class="bi bi-gear-fill nav-link__icon"></i><span class="nav-link__label">Configuración</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" title="Abrir menú">
+            <i class="bi bi-list mobile-menu-toggle__icon"></i>
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button class="notification-btn" title="Notificaciones">
+            <i class="bi bi-bell-fill notification-btn__icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile-wrapper">
+            <button class="user-profile" id="userProfileBtn" title="Menú de usuario">
+              <img src="https://ui-avatars.com/api/?name=Usuario&background=0D6EFD&color=fff" alt="Avatar" class="user-profile__avatar" id="userAvatar" />
+              <span class="user-profile__name" id="lblUserName">Administrador</span>
+              <i class="bi bi-chevron-down user-profile__chevron"></i>
+            </button>
+            <div class="user-profile__menu" id="userProfileMenu">
+              <div class="user-profile__menu-header">
+                <p class="user-profile__menu-name" id="lblUserNameMenu">Administrador</p>
+                <p class="user-profile__menu-email" id="lblUserEmail">usuario@example.invalid</p>
+              </div>
+              <div class="user-profile__menu-divider"></div>
+              <a href="./configuracion.html#configuracion" class="user-profile__menu-item"><i class="bi bi-gear"></i><span>Configuración</span></a>
+              <button class="user-profile__menu-item user-profile__menu-item--danger" id="btnLogout"><i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <section id="reportes" class="content-section is-active">
+          <header class="section-header">
+            <div class="section-header__info">
+              <h1 class="section-title">Generador de Reportes</h1>
+              <p class="section-subtitle">Análisis de ventas, inventario y kárdex con filtros personalizados</p>
+            </div>
+          </header>
+
+          <!-- Barra de Filtros -->
+          <div class="filters-bar">
+            <div class="filters-group">
+              <div class="form-group form-group--inline">
+                <label class="form-label">Desde:</label>
+                <input type="date" class="form-control" id="filterFechaDesde" value="2026-10-01" />
+              </div>
+              <div class="form-group form-group--inline">
+                <label class="form-label">Hasta:</label>
+                <input type="date" class="form-control" id="filterFechaHasta" value="2026-10-31" />
+              </div>
+              <div class="form-group form-group--inline">
+                <label class="form-label">Marca:</label>
+                <select class="select-control" id="filterMarca">
+                  <option value="todas">Todas</option>
+                </select>
+              </div>
+              <div class="filters-actions">
+                <button class="btn btn-success" id="btnExportarExcel">
+                  <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+                </button>
+                <button class="btn btn-dark" id="btnExportarPDF">
+                  <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Layout: Panel Lateral + Vista Previa -->
+          <div class="reportes-layout">
+            <!-- Panel Lateral: Tipo de Reporte -->
+            <aside class="reportes-panel">
+              <h3 class="reportes-panel__title">Tipo de Reporte</h3>
+              <div class="reportes-panel__list">
+                <button class="reporte-card reporte-card--active" data-tipo="ventas">
+                  <div class="reporte-card__icon reporte-card__icon--teal">
+                    <i class="bi bi-graph-up-arrow"></i>
+                  </div>
+                  <div class="reporte-card__body">
+                    <h4 class="reporte-card__title">Reporte de Ventas</h4>
+                    <p class="reporte-card__desc">Monitorea ingresos y volúmenes por período</p>
+                  </div>
+                </button>
+
+                <button class="reporte-card" data-tipo="inventario">
+                  <div class="reporte-card__icon reporte-card__icon--blue">
+                    <i class="bi bi-box-seam"></i>
+                  </div>
+                  <div class="reporte-card__body">
+                    <h4 class="reporte-card__title">Reporte de Inventario</h4>
+                    <p class="reporte-card__desc">Consumo de stock y valoración actual</p>
+                  </div>
+                </button>
+
+                <button class="reporte-card" data-tipo="movimientos">
+                  <div class="reporte-card__icon reporte-card__icon--orange">
+                    <i class="bi bi-arrow-left-right"></i>
+                  </div>
+                  <div class="reporte-card__body">
+                    <h4 class="reporte-card__title">Movimientos de Bodega</h4>
+                    <p class="reporte-card__desc">Kárdex completo de entradas y salidas</p>
+                  </div>
+                </button>
+
+                <button class="reporte-card" data-tipo="ranking">
+                  <div class="reporte-card__icon reporte-card__icon--purple">
+                    <i class="bi bi-trophy"></i>
+                  </div>
+                  <div class="reporte-card__body">
+                    <h4 class="reporte-card__title">Productos Más Vendidos</h4>
+                    <p class="reporte-card__desc">Ranking de SKUs de grifería estrella</p>
+                  </div>
+                </button>
+              </div>
+            </aside>
+
+            <!-- Área Principal: Vista Previa -->
+            <div class="reportes-preview">
+              <!-- VENTAS -->
+              <article class="card reporte-vista" id="vistaVentas">
+                <header class="card-header">
+                  <div>
+                    <h3 class="card-header__title" id="vistaPreviaTituloVentas">Vista Previa: Ventas por Categoría de Grifería</h3>
+                    <p class="reportes-preview__periodo">Período del reporte: Octubre 2026</p>
+                  </div>
+                  <span class="badge badge--success">
+                    <i class="bi bi-check-circle"></i> Generado Correctamente
+                  </span>
+                </header>
+                <div class="card-body">
+                  <div class="reportes-chart">
+                    <h4 class="reportes-chart__title">Ventas Totales Mensuales (Crecimiento)</h4>
+                    <div class="reportes-chart__container">
+                      <canvas id="reportesChartVentas" height="200"></canvas>
+                    </div>
+                  </div>
+                  <div class="reportes-table">
+                    <h4 class="reportes-table__title">Desglose por Categoría</h4>
+                    <div class="table-wrapper">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Categoría Suministrada</th>
+                            <th>Unidades Vendidas</th>
+                            <th>Ingreso Estimado</th>
+                            <th>Porcentaje total</th>
+                          </tr>
+                        </thead>
+                        <tbody id="reportesTableBodyVentas"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- INVENTARIO -->
+              <article class="card reporte-vista" id="vistaInventario" style="display: none;">
+                <header class="card-header">
+                  <div>
+                    <h3 class="card-header__title">Vista Previa: Valoración y Consumo de Stock</h3>
+                    <p class="reportes-preview__periodo">Período del reporte: Octubre 2026</p>
+                  </div>
+                  <span class="badge badge--success">
+                    <i class="bi bi-check-circle"></i> Generado Correctamente
+                  </span>
+                </header>
+                <div class="card-body">
+                  <!-- KPIs de Inventario -->
+                  <div class="stats-grid stats-grid--inventario">
+                    <article class="stat-card">
+                      <div class="stat-card__icon stat-card__icon--teal">
+                        <i class="bi bi-cash-stack"></i>
+                      </div>
+                      <div class="stat-card__content">
+                        <span class="stat-card__label">Valor Total del Inventario</span>
+                        <h2 class="stat-card__value" id="invValorTotal">S/0.00</h2>
+                        <span class="stat-card__hint">Valorización de stock almacenado</span>
+                      </div>
+                    </article>
+                    <article class="stat-card">
+                      <div class="stat-card__icon stat-card__icon--blue">
+                        <i class="bi bi-boxes"></i>
+                      </div>
+                      <div class="stat-card__content">
+                        <span class="stat-card__label">Total de Unidades en Stock</span>
+                        <h2 class="stat-card__value" id="invTotalUnidades">0</h2>
+                        <span class="stat-card__hint">Unidades disponibles</span>
+                      </div>
+                    </article>
+                    <article class="stat-card">
+                      <div class="stat-card__icon stat-card__icon--red">
+                        <i class="bi bi-exclamation-triangle"></i>
+                      </div>
+                      <div class="stat-card__content">
+                        <span class="stat-card__label">Productos con Stock Bajo</span>
+                        <h2 class="stat-card__value" id="invStockBajo">0</h2>
+                        <span class="stat-card__hint">SKUs críticos</span>
+                      </div>
+                    </article>
+                  </div>
+
+                  <!-- Gráfico de Dona -->
+                  <div class="reportes-chart">
+                    <h4 class="reportes-chart__title">Distribución del Valor por Categoría</h4>
+                    <div class="reportes-chart__container reportes-chart__container--donut">
+                      <canvas id="reportesChartInventario" height="220"></canvas>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Detalle de Stock -->
+                  <div class="reportes-table">
+                    <h4 class="reportes-table__title">Detalle de Stock y Valoración</h4>
+                    <div class="table-wrapper">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Código SKU</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock Actual</th>
+                            <th>Costo Unitario</th>
+                            <th>Valorización Total</th>
+                            <th>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody id="reportesTableBodyInventario"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- MOVIMIENTOS -->
+              <article class="card reporte-vista" id="vistaMovimientos" style="display: none;">
+                <header class="card-header">
+                  <div>
+                    <h3 class="card-header__title">Vista Previa: Kárdex de Movimientos de Bodega</h3>
+                    <p class="reportes-preview__periodo">Período del reporte: Octubre 2026</p>
+                  </div>
+                  <span class="badge badge--success">
+                    <i class="bi bi-check-circle"></i> Generado Correctamente
+                  </span>
+                </header>
+                <div class="card-body">
+                  <div class="reportes-table">
+                    <h4 class="reportes-table__title">Kárdex de Entradas y Salidas</h4>
+                    <div class="table-wrapper">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Motivo</th>
+                            <th>Usuario</th>
+                          </tr>
+                        </thead>
+                        <tbody id="reportesTableBodyMovimientos"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- RANKING -->
+              <article class="card reporte-vista" id="vistaRanking" style="display: none;">
+                <header class="card-header">
+                  <div>
+                    <h3 class="card-header__title">Vista Previa: Ranking de Productos Más Vendidos</h3>
+                    <p class="reportes-preview__periodo">Período del reporte: Octubre 2026</p>
+                  </div>
+                  <span class="badge badge--success">
+                    <i class="bi bi-check-circle"></i> Generado Correctamente
+                  </span>
+                </header>
+                <div class="card-body">
+                  <div class="reportes-table">
+                    <h4 class="reportes-table__title">Top Productos por Unidades Vendidas</h4>
+                    <div class="table-wrapper">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Posición</th>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Unidades Vendidas</th>
+                            <th>Ingreso Total</th>
+                          </tr>
+                        </thead>
+                        <tbody id="reportesTableBodyRanking"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../assets/js/modules/reportes.js"></script>
+  </body>
+</html>

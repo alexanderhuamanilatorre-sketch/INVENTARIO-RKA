@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Dashboard - RKA Sistema de Inventario</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <link rel="stylesheet" href="../assets/css/variables.css" />
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <script>
+      try {
+        if (window.innerWidth > 768 && localStorage.getItem("rkal_sidebar_collapsed") === "1") {
+          document.documentElement.classList.add("rkal-sidebar-collapsed");
+        }
+        var rawUser = localStorage.getItem("rkal_inventory_v2::currentUser");
+        if (rawUser) {
+          var perms = (JSON.parse(rawUser) || {}).permisos || [];
+          var allow = [];
+          for (var i = 0; i < perms.length; i++) {
+            if (perms[i] && perms[i].puedeVer) allow.push(perms[i].codigo);
+          }
+          document.documentElement.setAttribute("data-rkal-allow", allow.join(" "));
+        }
+      } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/utilities.css" />
+  </head>
+
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">R</div>
+          <span class="logo-text">RKA</span>
+        </div>
+        <button
+          class="sidebar-toggle"
+          id="sidebarToggle"
+          title="Colapsar/Expandir menú"
+        >
+          <i class="bi bi-chevron-left sidebar-toggle__icon"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+                <ul class="sidebar-nav__list">
+          <li class="sidebar-nav__item"><a href="./dashboard.html#dashboard" class="nav-link is-active" data-section="dashboard"><i class="bi bi-grid-1x2-fill nav-link__icon"></i><span class="nav-link__label">Dashboard</span></a></li>
+          <li class="sidebar-nav__item"><a href="./productos.html#productos" class="nav-link" data-section="productos"><i class="bi bi-tag-fill nav-link__icon"></i><span class="nav-link__label">Productos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./inventario.html#inventario" class="nav-link" data-section="inventario"><i class="bi bi-box-seam-fill nav-link__icon"></i><span class="nav-link__label">Inventario</span></a></li>
+          <li class="sidebar-nav__item"><a href="./movimientos.html#movimientos" class="nav-link" data-section="movimientos"><i class="bi bi-arrow-left-right nav-link__icon"></i><span class="nav-link__label">Movimientos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./ventas.html#ventas" class="nav-link" data-section="ventas"><i class="bi bi-cart-fill nav-link__icon"></i><span class="nav-link__label">Ventas</span></a></li>
+          <li class="sidebar-nav__item"><a href="./proveedores.html#proveedores" class="nav-link" data-section="proveedores"><i class="bi bi-truck nav-link__icon"></i><span class="nav-link__label">Proveedores</span></a></li>
+          <li class="sidebar-nav__item"><a href="./reportes.html#reportes" class="nav-link" data-section="reportes"><i class="bi bi-bar-chart-fill nav-link__icon"></i><span class="nav-link__label">Reportes</span></a></li>
+          <li class="sidebar-nav__item"><a href="./permisos.html#permisos" class="nav-link" data-section="configuracion.permisos"><i class="bi bi-shield-lock-fill nav-link__icon"></i><span class="nav-link__label">Permisos y accesos</span></a></li>
+          <li class="sidebar-nav__item"><a href="./configuracion.html#configuracion" class="nav-link" data-section="configuracion"><i class="bi bi-gear-fill nav-link__icon"></i><span class="nav-link__label">Configuración</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button
+            class="mobile-menu-toggle"
+            id="mobileMenuToggle"
+            title="Abrir menú"
+          >
+            <i class="bi bi-list mobile-menu-toggle__icon"></i>
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button class="notification-btn" title="Notificaciones">
+            <i class="bi bi-bell-fill notification-btn__icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile-wrapper">
+            <button
+              class="user-profile"
+              id="userProfileBtn"
+              title="Menú de usuario"
+            >
+              <img
+                src="https://ui-avatars.com/api/?name=Usuario&background=0D6EFD&color=fff"
+                alt="Avatar"
+                class="user-profile__avatar"
+                id="userAvatar"
+              />
+              <span class="user-profile__name" id="lblUserName"
+                >Administrador</span
+              >
+              <i class="bi bi-chevron-down user-profile__chevron"></i>
+            </button>
+            <div class="user-profile__menu" id="userProfileMenu">
+              <div class="user-profile__menu-header">
+                <p class="user-profile__menu-name" id="lblUserNameMenu">
+                  Administrador
+                </p>
+                <p class="user-profile__menu-email" id="lblUserEmail">
+                  usuario@example.invalid
+                </p>
+              </div>
+              <div class="user-profile__menu-divider"></div>
+              <a
+                href="./configuracion.html#configuracion"
+                class="user-profile__menu-item"
+                ><i class="bi bi-gear"></i><span>Configuración</span></a
+              >
+              <button
+                class="user-profile__menu-item user-profile__menu-item--danger"
+                id="btnLogout"
+              >
+                <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+        <section id="dashboard" class="content-section is-active">
+          <header class="section-header">
+            <div class="section-header__info">
+              <h1 class="section-title">Dashboard</h1>
+              <p class="section-subtitle">
+                Estadísticas en tiempo real (Total productos, Entradas, Salidas,
+                Stock bajo)
+              </p>
+            </div>
+          </header>
+
+          <div class="stats-grid">
+            <article class="stat-card">
+              <div class="stat-card__icon stat-card__icon--blue">
+                <i class="bi bi-box-seam"></i>
+              </div>
+              <div class="stat-card__content">
+                <span class="stat-card__label">Total Productos</span>
+                <h2 class="stat-card__value" id="totalProductos">0</h2>
+                <span class="stat-card__hint">En inventario</span>
+              </div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-card__icon stat-card__icon--green">
+                <i class="bi bi-arrow-down-circle"></i>
+              </div>
+              <div class="stat-card__content">
+                <span class="stat-card__label">Entradas</span>
+                <h2 class="stat-card__value" id="totalEntradas">0</h2>
+                <span class="stat-card__hint">Total de ingresos</span>
+              </div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-card__icon stat-card__icon--red">
+                <i class="bi bi-arrow-up-circle"></i>
+              </div>
+              <div class="stat-card__content">
+                <span class="stat-card__label">Salidas</span>
+                <h2 class="stat-card__value" id="totalSalidas">0</h2>
+                <span class="stat-card__hint">Total de egresos</span>
+              </div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-card__icon stat-card__icon--orange">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+              <div class="stat-card__content">
+                <span class="stat-card__label">Stock Bajo</span>
+                <h2 class="stat-card__value" id="stockBajo">0</h2>
+                <span class="stat-card__hint">Requieren reposición</span>
+              </div>
+            </article>
+          </div>
+
+          <article class="card">
+            <header class="card-header">
+              <h3 class="card-header__title">
+                Historial de Ventas (últimos 6 meses)
+              </h3>
+            </header>
+            <div class="card-body">
+              <canvas id="ventasChart" height="120"></canvas>
+            </div>
+          </article>
+
+          <div class="dashboard-row">
+            <article class="card dashboard-row__main">
+              <header class="card-header">
+                <h3 class="card-header__title">Movimientos Recientes</h3>
+                <a href="./movimientos.html#movimientos" class="btn btn-link"
+                  >Ver todos</a
+                >
+              </header>
+              <div class="card-body p-0">
+                <div class="table-wrapper">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Motivo</th>
+                        <th>Usuario</th>
+                      </tr>
+                    </thead>
+                    <tbody id="movimientosRecientes"></tbody>
+                  </table>
+                </div>
+              </div>
+            </article>
+
+            <article class="card dashboard-row__side">
+              <header class="card-header">
+                <h3 class="card-header__title">Alertas de Reabastecimiento</h3>
+                <a
+                  href="./productos.html#productos"
+                  class="badge badge--danger"
+                  id="alertaUrgente"
+                  style="text-decoration: none"
+                  >Urgente</a
+                >
+              </header>
+              <div class="card-body" id="alertasReabastecimientoBody">
+                <div class="empty-state">
+                  <i class="bi bi-check-circle empty-state__icon"></i>
+                  <p class="empty-state__text">
+                    No hay productos con stock bajo
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../assets/js/modules/dashboard.js"></script>
+  </body>
+</html>
