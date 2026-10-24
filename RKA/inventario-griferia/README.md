@@ -67,11 +67,24 @@ La cuenta administradora se conserva y puede iniciar sesión con normalidad. Por
 - **Correo:** `admin@rkal.com`
 - **Contraseña:** `rkal.administrador_2026`
 
-## Cómo usar
+## Inicio rápido
 
-1. Configura PostgreSQL y las variables de entorno descritas en [backend/README.md](./backend/README.md).
-2. Ejecuta el esquema, las semillas y las migraciones RBAC, de contraseñas y de numeración de ventas (`npm run migrate:all` desde `backend/`).
-3. Inicia el backend con [INICIAR-BACKEND.bat](./INICIAR-BACKEND.bat) y abre `http://localhost:3000` en tu navegador.
+### Opción 1: proyecto completo con backend
+
+1. Configura PostgreSQL y crea el archivo `backend/.env` con las credenciales de la base de datos, siguiendo la referencia de [backend/README.md](./backend/README.md).
+2. Ejecuta el esquema, las semillas y las migraciones de la base de datos desde `backend/` (`npm run migrate:all`).
+3. Desde la raíz del proyecto, ejecuta [INICIAR-BACKEND.bat](./INICIAR-BACKEND.bat).
+4. Abre `http://localhost:3000/index.html` en tu navegador.
+
+El lanzador de Windows ejecuta `backend/start-backend.ps1`, verifica que `node` y `npm` estén disponibles, instala dependencias en `%LOCALAPPDATA%\RKA\backend-dependencies` si hace falta y levanta la API en `http://localhost:3000`.
+
+### Opción 2: servidor estático del frontend
+
+Si solo quieres levantar la parte visual del sistema sin activar la API, ejecuta [INICIAR-SERVIDOR.bat](./INICIAR-SERVIDOR.bat). Esto abre la aplicación en `http://localhost:8000/index.html` usando `python -m http.server`.
+
+> Importante: el backend y el servidor estático son opciones diferentes. La aplicación completa debe usarse con `INICIAR-BACKEND.bat`; `INICIAR-SERVIDOR.bat` sirve solo para pruebas rápidas del frontend.
+
+## Cómo usar
 
 La cuenta inicial se crea al ejecutar las semillas con la contraseña definida en `SEED_ADMIN_PASSWORD`. Las credenciales de la instalación local están documentadas arriba.
 
