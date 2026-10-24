@@ -24,10 +24,6 @@ import { NotificationModal } from "../core/notifications.js";
   const inputApellidos = document.getElementById("inputApellidos");
   const inputNacionalidad = document.getElementById("inputNacionalidad");
   const inputEmailUsuario = document.getElementById("inputEmailUsuario");
-  const grupoPreguntaSeguridad = document.getElementById("grupoPreguntaSeguridad");
-  const grupoRespuestaSeguridad = document.getElementById("grupoRespuestaSeguridad");
-  const inputPreguntaSeguridad = document.getElementById("inputPreguntaSeguridad");
-  const inputRespuestaSeguridad = document.getElementById("inputRespuestaSeguridad");
   const inputPasswordGenerada = document.getElementById("inputPasswordGenerada");
   const btnCopiarPassword = document.getElementById("btnCopiarPassword");
 
@@ -40,6 +36,7 @@ import { NotificationModal } from "../core/notifications.js";
 
   let modoEdicion = false;
   let indiceEdicion = -1;
+  let rolAdministradorProtegido = false;
 
   function openUsuarioModal(indice = -1) {
     modoEdicion = indice >= 0;
@@ -54,36 +51,41 @@ import { NotificationModal } from "../core/notifications.js";
 
     if (modoEdicion) {
       const u = USUARIOS_EJEMPLO[indice];
-      if (!u) return;
+      if (!u || !puedeVerPerfil(u)) return;
       if (selectTipoDocumento) selectTipoDocumento.value = u.tipoDocumento || "dni";
       if (inputNumDocumento) inputNumDocumento.value = u.numDocumento || "";
       if (inputNombres) inputNombres.value = u.nombres || "";
       if (inputApellidos) inputApellidos.value = u.apellidos || "";
       if (inputNacionalidad) inputNacionalidad.value = u.nacionalidad || "";
-      // La pregunta y respuesta de seguridad solo se configuran al crear.
-      grupoPreguntaSeguridad?.classList.add("d-none");
-      grupoRespuestaSeguridad?.classList.add("d-none");
-      if (inputPreguntaSeguridad) {
-        inputPreguntaSeguridad.value = "";
-        inputPreguntaSeguridad.required = false;
-      }
-      if (inputRespuestaSeguridad) {
-        inputRespuestaSeguridad.value = "";
-        inputRespuestaSeguridad.required = false;
-      }
       const selectRol = document.getElementById("selectRolUsuario");
-      if (selectRol && u.rol) {
-        const existe = Array.from(selectRol.options).some(
-          (opcion) => opcion.value === u.rol
-        );
-        if (!existe) {
-          const opcion = document.createElement("option");
-          opcion.value = u.rol;
-          opcion.textContent = u.rol;
-          opcion.dataset.rolTemporal = "1";
-          selectRol.appendChild(opcion);
+      const grupoRol = document.getElementById("grupoRolUsuario");
+      // El rol Administrador no se ofrece en el formulario: la cuenta
+      // se conserva y solo mantiene su rol actual.
+      rolAdministradorProtegido = normalizar(u.rol) === "administrador";
+      if (rolAdministradorProtegido) {
+        grupoRol?.classList.add("d-none");
+        if (selectRol) {
+          selectRol.required = false;
+          selectRol.value = "";
         }
-        selectRol.value = u.rol;
+      } else {
+        grupoRol?.classList.remove("d-none");
+        if (selectRol) {
+          selectRol.required = true;
+          if (u.rol) {
+            const existe = Array.from(selectRol.options).some(
+              (opcion) => opcion.value === u.rol
+            );
+            if (!existe) {
+              const opcion = document.createElement("option");
+              opcion.value = u.rol;
+              opcion.textContent = u.rol;
+              opcion.dataset.rolTemporal = "1";
+              selectRol.appendChild(opcion);
+            }
+            selectRol.value = u.rol;
+          }
+        }
       }
       if (inputEmailUsuario) inputEmailUsuario.value = u.email || "";
       if (inputPasswordGenerada) inputPasswordGenerada.value = u.contrasena || "";
@@ -91,16 +93,10 @@ import { NotificationModal } from "../core/notifications.js";
       if (modalTitle) modalTitle.textContent = "Editar Usuario";
       if (submitText) submitText.textContent = "Guardar Cambios";
     } else {
-      grupoPreguntaSeguridad?.classList.remove("d-none");
-      grupoRespuestaSeguridad?.classList.remove("d-none");
-      if (inputPreguntaSeguridad) {
-        inputPreguntaSeguridad.value = "";
-        inputPreguntaSeguridad.required = true;
-      }
-      if (inputRespuestaSeguridad) {
-        inputRespuestaSeguridad.value = "";
-        inputRespuestaSeguridad.required = true;
-      }
+      rolAdministradorProtegido = false;
+      document.getElementById("grupoRolUsuario")?.classList.remove("d-none");
+      const selectRol = document.getElementById("selectRolUsuario");
+      if (selectRol) selectRol.required = true;
       actualizarCredenciales();
       if (modalTitle) modalTitle.textContent = "Nuevo Usuario";
       if (submitText) submitText.textContent = "Crear Usuario";
@@ -282,6 +278,7 @@ import { NotificationModal } from "../core/notifications.js";
       apellidos: u.apellidos || "",
       email: u.email || "",
       rol: u.rol || "",
+      rolCodigo: u.rolCodigo || "",
       estado: u.estado || "Activo",
       tipoDocumento: u.tipoDocumento || "dni",
       numDocumento: u.numDocumento || "",
@@ -294,6 +291,22 @@ import { NotificationModal } from "../core/notifications.js";
         ? AppCore.formatDateTime(u.ultimoAcceso)
         : "Nunca ha iniciado sesión",
     };
+  }
+
+  /** Indica si la sesión actual pertenece al rol Administrador. */
+  function esAdministradorActual() {
+    const actual = authService.getCurrentUser();
+    return normalizar(actual?.rolCodigo || actual?.rol) === "administrador";
+  }
+
+  /** Indica si el usuario mostrado tiene el rol Administrador. */
+  function esPerfilAdministrador(usuario) {
+    return normalizar(usuario?.rolCodigo || usuario?.rol) === "administrador";
+  }
+
+  /** Solo el Administrador puede ver el perfil de otro Administrador. */
+  function puedeVerPerfil(usuario) {
+    return esAdministradorActual() || !esPerfilAdministrador(usuario);
   }
 
   /** Modelo del formulario -> cuerpo JSON de la API. */
@@ -383,27 +396,12 @@ import { NotificationModal } from "../core/notifications.js";
     const nombres = (formData.get("nombres") || "").trim();
     const apellidos = (formData.get("apellidos") || "").trim();
     const nacionalidad = (formData.get("nacionalidad") || "").trim();
-    const rol = formData.get("rol");
+    const rol =
+      rolAdministradorProtegido && indiceEdicion >= 0
+        ? USUARIOS_EJEMPLO[indiceEdicion]?.rol || formData.get("rol")
+        : formData.get("rol");
     const email = (formData.get("email") || "").trim();
     const numDocumento = (formData.get("numDocumento") || "").trim();
-    const preguntaSeguridad = (formData.get("preguntaSeguridad") || "").trim();
-    const respuestaSeguridad = (formData.get("respuestaSeguridad") || "").trim();
-
-    if (!modoEdicion) {
-      if (!preguntaSeguridad || !respuestaSeguridad) {
-        alert("La pregunta y la respuesta de seguridad son obligatorias.");
-        return;
-      }
-    } else if (respuestaSeguridad && !preguntaSeguridad) {
-      alert("Indica la pregunta de seguridad junto con la respuesta.");
-      return;
-    } else if (!respuestaSeguridad && indiceEdicion >= 0) {
-      const preguntaActual = (USUARIOS_EJEMPLO[indiceEdicion].preguntaSeguridad || "").trim();
-      if (preguntaSeguridad && preguntaSeguridad !== preguntaActual) {
-        alert("Para cambiar la pregunta de seguridad debes escribir una nueva respuesta.");
-        return;
-      }
-    }
 
     const numError = Validations.firstError([
       [Validations.required(nombres, 3), "Los nombres son obligatorios (mínimo 3 caracteres)."],
@@ -471,7 +469,7 @@ import { NotificationModal } from "../core/notifications.js";
         numDocumento,
         nacionalidad,
         usuario: usuarioFinal,
-        preguntaSeguridad: respuestaSeguridad ? preguntaSeguridad : previo.preguntaSeguridad || "",
+        preguntaSeguridad: previo.preguntaSeguridad || "",
         contrasena: previo.contrasena || contrasena,
       };
 
@@ -487,9 +485,7 @@ import { NotificationModal } from "../core/notifications.js";
           tipoDocumento: formData.get("tipoDocumento"),
           numDocumento,
           nacionalidad,
-          preguntaSeguridad: respuestaSeguridad
-            ? preguntaSeguridad
-            : users[idx].preguntaSeguridad || "",
+          preguntaSeguridad: users[idx].preguntaSeguridad || "",
           actualizadoEn: new Date().toISOString(),
         };
         authService.saveUsers(users);
@@ -504,8 +500,6 @@ import { NotificationModal } from "../core/notifications.js";
             body: JSON.stringify(
               payloadUsuario({
                 ...USUARIOS_EJEMPLO[indiceEdicion],
-                preguntaSeguridad,
-                respuestaSeguridad,
               })
             ),
           });
@@ -543,7 +537,6 @@ import { NotificationModal } from "../core/notifications.js";
       nombre: `${nombres} ${apellidos}`,
       correo: correoFinal,
       contrasena,
-      preguntaSeguridad,
       rol,
       tipoDocumento: formData.get("tipoDocumento"),
       numDocumento,
@@ -566,7 +559,6 @@ import { NotificationModal } from "../core/notifications.js";
       numDocumento,
       nacionalidad,
       usuario: usuarioFinal,
-      preguntaSeguridad,
       contrasena,
       creadoEn: new Date().toISOString(),
       ultimoAcceso: "Nunca ha iniciado sesión",
@@ -576,9 +568,7 @@ import { NotificationModal } from "../core/notifications.js";
     try {
       const creado = await apiUsuarios(API_USUARIOS, {
         method: "POST",
-        body: JSON.stringify(
-          payloadUsuario({ ...nuevoRegistro, preguntaSeguridad, respuestaSeguridad })
-        ),
+        body: JSON.stringify(payloadUsuario(nuevoRegistro)),
       });
       nuevoRegistro.id = creado.id;
       if (creado.creadoEn) nuevoRegistro.creadoEn = creado.creadoEn;
@@ -616,7 +606,7 @@ import { NotificationModal } from "../core/notifications.js";
   }
 
   function abrirDetalleUsuario(usuario, indice = -1) {
-    if (!modalDetalle || !usuario) return;
+    if (!modalDetalle || !usuario || !puedeVerPerfil(usuario)) return;
     usuarioDetalleActual = usuario;
     indiceDetalle = indice;
 
@@ -751,14 +741,19 @@ import { NotificationModal } from "../core/notifications.js";
 
   function renderUsuarios() {
     if (!usuariosTableBody) return;
-    usuariosTableBody.innerHTML = USUARIOS_EJEMPLO.map(
-      (u, i) => `
+    const visibles = USUARIOS_EJEMPLO.map((u, i) => ({ u, i })).filter(
+      ({ u }) => puedeVerPerfil(u)
+    );
+    usuariosTableBody.innerHTML = visibles
+      .map(
+        ({ u, i }) => `
       <tr class="usuario-row" data-index="${i}" tabindex="0" role="button" aria-label="Ver detalle de ${u.nombre}">
         <td><strong>${u.nombre}</strong><br /><small class="text-muted">${u.email}</small></td>
         <td>${u.rol}</td>
         <td><span class="badge ${u.estado === "Activo" ? "badge--success" : "badge--danger"}">${u.estado}</span></td>
       </tr>`
-    ).join("");
+      )
+      .join("");
   }
 
   // Clic o Enter en una fila abre el detalle
@@ -787,7 +782,9 @@ import { NotificationModal } from "../core/notifications.js";
   }
 
   async function guardarUsuariosEnBd() {
-    const usuariosBd = USUARIOS_EJEMPLO.filter((u) => u.id != null);
+    const usuariosBd = USUARIOS_EJEMPLO.filter(
+      (u) => u.id != null && puedeVerPerfil(u)
+    );
     let guardados = 0;
     for (const u of usuariosBd) {
       try {

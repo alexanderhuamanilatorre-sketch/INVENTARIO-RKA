@@ -18,6 +18,9 @@ import { NotificationModal } from "../core/notifications.js";
   // Roles que no se ofrecen en el selector "Rol a configurar".
   const ROLES_NO_CONFIGURABLES = new Set(["cliente", "vendedor"]);
 
+  // El rol Administrador no se muestra en la matriz comparativa por seguridad.
+  const ROLES_OCULTOS_MATRIZ = new Set(["administrador"]);
+
   const state = {
     roles: [],
     secciones: [],
@@ -914,7 +917,9 @@ import { NotificationModal } from "../core/notifications.js";
   function renderMatriz() {
     if (!state.matrix) return;
     const roles = (state.matrix.roles || []).filter(
-      (rol) => !ROLES_NO_CONFIGURABLES.has(rol.codigo)
+      (rol) =>
+        !ROLES_NO_CONFIGURABLES.has(rol.codigo) &&
+        !ROLES_OCULTOS_MATRIZ.has(String(rol.codigo || "").toLowerCase())
     );
     const secciones = state.matrix.secciones || [];
     const visibles = construirVisiblesMatriz(roles);

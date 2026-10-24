@@ -1,9 +1,12 @@
 -- ============================================================================
 -- migration_passwords.sql
--- Recuperación de contraseña con pregunta de seguridad y tokens de un solo uso.
+-- Recuperación de contraseña con verificación de documento/correo y tokens de un solo uso.
 -- Es idempotente y puede ejecutarse sobre una base existente.
 -- ============================================================================
 
+-- Columnas heredadas de la recuperación por pregunta de seguridad. Se conservan
+-- para no perder datos de instalaciones anteriores, pero el flujo actual ya no
+-- las utiliza: la identidad se valida con documento y correo registrado.
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS pregunta_seguridad   VARCHAR(200);
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS respuesta_seguridad  VARCHAR(255);
 -- Contraseña visible para el panel administrativo, cifrada en reposo.

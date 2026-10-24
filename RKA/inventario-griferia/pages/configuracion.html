@@ -116,11 +116,6 @@
                 </p>
               </div>
               <div class="user-profile__menu-divider"></div>
-              <a
-                href="./configuracion.html#configuracion"
-                class="user-profile__menu-item"
-                ><i class="bi bi-gear"></i><span>Configuración</span></a
-              >
               <button
                 class="user-profile__menu-item user-profile__menu-item--danger"
                 id="btnLogout"
@@ -388,7 +383,7 @@
                   placeholder="Nacionalidad"
                 data-type="string" />
               </div>
-              <div class="form-group">
+              <div class="form-group" id="grupoRolUsuario">
                 <label class="form-label" for="selectRolUsuario">Rol</label>
                 <select
                   class="select-control"
@@ -414,49 +409,6 @@
                   placeholder="Se genera automáticamente"
                   readonly
                 data-type="email" />
-              </div>
-              <div class="form-group form-group--full" id="grupoPreguntaSeguridad">
-                <label class="form-label" for="inputPreguntaSeguridad"
-                  >Pregunta de seguridad</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="inputPreguntaSeguridad"
-                  name="preguntaSeguridad"
-                  list="listaPreguntasSeguridad"
-                  placeholder="Elige o escribe una pregunta"
-                  maxlength="200"
-                  autocomplete="off"
-                />
-                <datalist id="listaPreguntasSeguridad">
-                  <option value="¿Cuál es el nombre de tu primera mascota?"></option>
-                  <option value="¿Cuál es el nombre de tu ciudad natal?"></option>
-                  <option value="¿Cuál es el nombre de tu escuela primaria?"></option>
-                  <option value="¿Cuál es tu comida favorita?"></option>
-                  <option value="¿Cuál es el nombre de tu mejor amigo de la infancia?"></option>
-                </datalist>
-                <p class="form-hint">
-                  Se usará para recuperar la contraseña desde el inicio de sesión.
-                </p>
-              </div>
-              <div class="form-group form-group--full" id="grupoRespuestaSeguridad">
-                <label class="form-label" for="inputRespuestaSeguridad"
-                  >Respuesta de seguridad</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="inputRespuestaSeguridad"
-                  name="respuestaSeguridad"
-                  placeholder="Escribe la respuesta"
-                  maxlength="200"
-                  autocomplete="off"
-                  data-type="text"
-                />
-                <p class="form-hint">
-                  Se usará para recuperar la contraseña desde el inicio de sesión.
-                </p>
               </div>
               <div class="form-group form-group--full">
                 <label class="form-label" for="inputPasswordGenerada"

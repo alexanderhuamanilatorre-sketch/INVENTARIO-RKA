@@ -221,11 +221,12 @@
 }
 
 .auth-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(0.5rem, 2vw, 1.25rem);
-  padding: 0.75rem 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  width: 100%;
+  gap: clamp(0.25rem, 1vw, 0.75rem);
+  padding: 0.5rem;
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
   border-radius: var(--border-radius-lg);
@@ -234,10 +235,14 @@
 .auth-stepper__item {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0.5rem clamp(0.25rem, 1vw, 0.75rem);
   border-radius: var(--border-radius-md);
   color: var(--gray-600);
+  text-align: center;
   transition: var(--transition-fast) ease;
 }
 .auth-stepper__item.active {
@@ -247,6 +252,7 @@
 }
 
 .auth-stepper__index {
+  flex: 0 0 28px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -262,10 +268,20 @@
   background: var(--color-primary);
   color: #ffffff;
 }
+.auth-stepper__item.completed .auth-stepper__index {
+  background: var(--color-success);
+  color: #ffffff;
+}
+.auth-stepper__item.completed {
+  color: var(--gray-700);
+}
 .auth-stepper__label {
-  font-size: clamp(0.875rem, 1.5vw, 0.95rem);
+  min-width: 0;
+  font-size: clamp(0.78rem, 1.2vw, 0.9rem);
   font-weight: 500;
-  white-space: nowrap;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .auth-step {
@@ -414,14 +430,16 @@
   .auth-features {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 560px) {
   .auth-stepper {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    row-gap: 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
   }
   .auth-stepper__item {
-    flex: 1 1 auto;
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 

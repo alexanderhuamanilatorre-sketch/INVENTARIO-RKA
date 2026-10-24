@@ -8,10 +8,35 @@ const { getPermisosEfectivos, getInicio } = require("../services/rbac.service");
 const handlers = {};
 
 const RECUPERACION_TTL_MINUTOS = 10;
-const MAX_INTENTOS_RESPUESTA = 5;
+const MAX_INTENTOS_VERIFICACION = 5;
 
 function sha256(valor) {
   return crypto.createHash("sha256").update(String(valor)).digest("hex");
+}
+
+/** Normaliza el documento para ignorar puntos, guiones, espacios y mayúsculas. */
+function normalizarDocumento(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/** Normaliza el correo para compararlo sin espacios ni mayúsculas. */
+function normalizarCorreo(valor) {
+  return String(valor || "").trim().toLowerCase();
+}
+
+/** Oculta parte del correo para mostrarlo como referencia en la interfaz. */
+function enmascararCorreo(valor) {
+  const correo = normalizarCorreo(valor);
+  const arroba = correo.indexOf("@");
+  if (arroba <= 0) return correo || "";
+  const usuario = correo.slice(0, arroba);
+  const dominio = correo.slice(arroba + 1);
+  return `${usuario.slice(0, 1)}***@${dominio}`;
 }
 
 /** Normaliza la respuesta para que mayúsculas, tildes y espacios no importen. */
@@ -119,6 +144,48 @@ const SELECT_USUARIOS = `
       FROM usuarios u
       LEFT JOIN roles r ON r.id_rol = u.id_rol`;
 
+/** Indica si la sesión autenticada pertenece al rol Administrador. */
+function esAdministrador(usuario) {
+  return String(usuario?.rolCodigo || "").trim().toLowerCase() === "administrador";
+}
+
+/** Comprueba si el usuario indicado tiene el rol Administrador. */
+async function esUsuarioAdministrador(idUsuario) {
+  const { rows } = await DatabaseModel.query(
+    `SELECT 1
+       FROM usuarios u
+       LEFT JOIN roles r ON r.id_rol = u.id_rol
+      WHERE u.id_usuario = $1
+        AND LOWER(COALESCE(r.codigo, '')) = 'administrador'
+      LIMIT 1`,
+    [idUsuario]
+  );
+  return rows.length > 0;
+}
+
+/** Comprueba si el rol indicado es el rol Administrador. */
+async function esRolAdministrador(idRol) {
+  if (!idRol) return false;
+  const { rows } = await DatabaseModel.query(
+    `SELECT 1 FROM roles
+      WHERE id_rol = $1 AND LOWER(COALESCE(codigo, '')) = 'administrador'
+      LIMIT 1`,
+    [idRol]
+  );
+  return rows.length > 0;
+}
+
+/**
+ * Solo el Administrador puede ver o modificar el perfil de otro Administrador.
+ * Se responde 404 para no revelar que la cuenta existe.
+ */
+async function perfilAdministradorProtegido(req, res, idUsuario) {
+  if (esAdministrador(req.usuario)) return false;
+  if (!(await esUsuarioAdministrador(idUsuario))) return false;
+  JsonView.send(res, 404, { error: "Usuario no encontrado." });
+  return true;
+}
+
 /**
  * Convierte una fila de BD al modelo que consume el frontend.
  * La contraseña recuperable solo se incluye en las rutas administrativas.
@@ -177,7 +244,12 @@ function errorDeLlave(err, res) {
 /* -------------------------------------------------------------------------- */
 handlers['GET /'] = async (req, res) => {
   try {
-    const { rows } = await DatabaseModel.query(`${SELECT_USUARIOS} ORDER BY u.id_usuario`);
+    const filtroAdmin = esAdministrador(req.usuario)
+      ? ""
+      : " WHERE LOWER(COALESCE(r.codigo, '')) <> 'administrador'";
+    const { rows } = await DatabaseModel.query(
+      `${SELECT_USUARIOS}${filtroAdmin} ORDER BY u.id_usuario`
+    );
     JsonView.send(
       res,
       200,
@@ -193,6 +265,7 @@ handlers['GET /'] = async (req, res) => {
 /* -------------------------------------------------------------------------- */
 handlers['GET /:id'] = async (req, res) => {
   try {
+    if (await perfilAdministradorProtegido(req, res, req.params.id)) return;
     const { rows } = await DatabaseModel.query(`${SELECT_USUARIOS} WHERE u.id_usuario = $1`, [
       req.params.id,
     ]);
@@ -233,6 +306,11 @@ handlers['POST /'] = async (req, res) => {
     }
 
     const idRol = await resolverIdRol(rol, id_rol);
+    if (!esAdministrador(req.usuario) && (await esRolAdministrador(idRol))) {
+      return JsonView.send(res, 403, {
+        error: "No puedes asignar el rol Administrador.",
+      });
+    }
     const rolValido = await validarRolAsignable(idRol, Boolean(rol || id_rol));
     if (!rolValido.ok) {
       return JsonView.send(res, rolValido.status, { error: rolValido.error });
@@ -293,6 +371,8 @@ handlers['PUT /:id'] = async (req, res) => {
       respuestaSeguridad, respuesta_seguridad,
     } = req.body;
 
+    if (await perfilAdministradorProtegido(req, res, req.params.id)) return;
+
     const pregunta = String(preguntaSeguridad || pregunta_seguridad || "").trim();
     const respuesta = String(respuestaSeguridad || respuesta_seguridad || "").trim();
     if (pregunta && !respuesta) {
@@ -311,6 +391,11 @@ handlers['PUT /:id'] = async (req, res) => {
       (id_rol !== undefined && id_rol !== null && id_rol !== "") ||
       (rol !== undefined && rol !== null && rol !== "");
     if (rolSolicitado) {
+      if (!esAdministrador(req.usuario) && (await esRolAdministrador(idRol))) {
+        return JsonView.send(res, 403, {
+          error: "No puedes asignar el rol Administrador.",
+        });
+      }
       const rolValido = await validarRolAsignable(idRol, true);
       if (!rolValido.ok) {
         return JsonView.send(res, rolValido.status, { error: rolValido.error });
@@ -378,6 +463,7 @@ handlers['PUT /:id'] = async (req, res) => {
 /* -------------------------------------------------------------------------- */
 handlers['DELETE /:id'] = async (req, res) => {
   try {
+    if (await perfilAdministradorProtegido(req, res, req.params.id)) return;
     const { rowCount } = await DatabaseModel.query(
       "DELETE FROM usuarios WHERE id_usuario = $1",
       [req.params.id]
@@ -394,6 +480,7 @@ handlers['DELETE /:id'] = async (req, res) => {
 /* -------------------------------------------------------------------------- */
 handlers['POST /:id/restablecer'] = async (req, res) => {
   try {
+    if (await perfilAdministradorProtegido(req, res, req.params.id)) return;
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) {
       return JsonView.send(res, 400, { error: "Usuario inválido." });
@@ -539,8 +626,7 @@ handlers['POST /recuperacion/iniciar'] = async (req, res) => {
     }
 
     const { rows } = await DatabaseModel.query(
-      `SELECT id_usuario, usuario_login, correo, estado,
-              pregunta_seguridad, respuesta_seguridad
+      `SELECT id_usuario, usuario_login, correo, estado, dni
          FROM usuarios
         WHERE LOWER(correo) = LOWER($1) OR LOWER(usuario_login) = LOWER($1)
         LIMIT 1`,
@@ -557,10 +643,10 @@ handlers['POST /recuperacion/iniciar'] = async (req, res) => {
         error: "La cuenta está inactiva. Contacta al administrador.",
       });
     }
-    if (!user.pregunta_seguridad || !user.respuesta_seguridad) {
+    if (!user.dni || !user.correo) {
       return JsonView.send(res, 422, {
         error:
-          "Esta cuenta no tiene pregunta de seguridad configurada. Contacta al administrador para restablecer la contraseña.",
+          "Esta cuenta no tiene documento ni correo registrados. Contacta al administrador para restablecer la contraseña.",
       });
     }
 
@@ -580,8 +666,7 @@ handlers['POST /recuperacion/iniciar'] = async (req, res) => {
     JsonView.send(res, 200, {
       solicitudId,
       usuario: user.usuario_login,
-      correo: user.correo || "",
-      preguntaSeguridad: user.pregunta_seguridad,
+      correo: enmascararCorreo(user.correo),
     });
   } catch (err) {
     JsonView.send(res, 500, { error: err.message });
@@ -594,19 +679,22 @@ handlers['POST /recuperacion/iniciar'] = async (req, res) => {
 handlers['POST /recuperacion/verificar'] = async (req, res) => {
   try {
     const solicitudId = String(req.body?.solicitudId || "").trim();
-    const respuesta = String(req.body?.respuesta || "").trim();
-    if (!solicitudId || !respuesta) {
+    const documento = String(req.body?.dni || "").trim();
+    const correo = String(req.body?.correo || "").trim();
+    if (!solicitudId || !documento || !correo) {
       return JsonView.send(res, 400, {
-        error: "La solicitud y la respuesta de seguridad son obligatorias.",
+        error: "El documento de identidad y el correo registrado son obligatorios.",
       });
     }
-    if (respuesta.length > 200) {
-      return JsonView.send(res, 400, { error: "La respuesta de seguridad es demasiado larga." });
+    if (documento.length > 40 || correo.length > 160) {
+      return JsonView.send(res, 400, {
+        error: "Los datos de verificación son demasiado largos.",
+      });
     }
 
     const { rows } = await DatabaseModel.query(
       `SELECT r.id_recuperacion, r.id_usuario, r.intentos, r.expira_en, r.usado,
-              u.respuesta_seguridad, u.estado
+              u.dni, u.correo, u.estado
          FROM recuperaciones_contrasena r
          JOIN usuarios u ON u.id_usuario = r.id_usuario
         WHERE r.token_hash = $1
@@ -624,22 +712,25 @@ handlers['POST /recuperacion/verificar'] = async (req, res) => {
         error: "La cuenta está inactiva. Contacta al administrador.",
       });
     }
-    if (Number(rec.intentos) >= MAX_INTENTOS_RESPUESTA) {
+    if (Number(rec.intentos) >= MAX_INTENTOS_VERIFICACION) {
       return JsonView.send(res, 429, {
         error: "Demasiados intentos. Vuelve a iniciar el proceso de recuperación.",
       });
     }
 
-    const verificacion = await verifyPassword(
-      normalizarRespuesta(respuesta),
-      rec.respuesta_seguridad || ""
-    );
-    if (!verificacion.ok) {
+    const documentoOk =
+      Boolean(rec.dni) &&
+      normalizarDocumento(documento) === normalizarDocumento(rec.dni);
+    const correoOk =
+      Boolean(rec.correo) && normalizarCorreo(correo) === normalizarCorreo(rec.correo);
+    if (!documentoOk || !correoOk) {
       await DatabaseModel.query(
         "UPDATE recuperaciones_contrasena SET intentos = intentos + 1 WHERE id_recuperacion = $1",
         [rec.id_recuperacion]
       );
-      return JsonView.send(res, 401, { error: "La respuesta de seguridad no es correcta." });
+      return JsonView.send(res, 401, {
+        error: "El documento o el correo no coinciden con la cuenta.",
+      });
     }
 
     const token = crypto.randomBytes(32).toString("hex");

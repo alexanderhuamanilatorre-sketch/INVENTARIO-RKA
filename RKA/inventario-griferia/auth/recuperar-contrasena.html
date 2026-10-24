@@ -61,21 +61,28 @@
           <i class="bi bi-shield-check"></i>
           <div>
             <p class="auth-info-box__title">Cuenta encontrada</p>
-            <p class="auth-info-box__text">Usuario: <strong id="lblUsuarioRecuperacion">-</strong> | Correo: <strong id="lblCorreoRecuperacion">-</strong></p>
+            <p class="auth-info-box__text">
+              Usuario: <strong id="lblUsuarioRecuperacion">-</strong><br />
+              Correo registrado: <strong id="lblCorreoRecuperacion">-</strong>
+            </p>
           </div>
         </div>
         <form id="formVerificarIdentidad" class="auth-form" novalidate>
           <div class="form-group">
-            <label for="lblPreguntaSeguridad">Pregunta de seguridad</label>
-            <input type="text" id="lblPreguntaSeguridad" class="form-control" readonly disabled />
+            <label for="inputDocumentoRecuperacion">Documento de identidad</label>
+            <div class="input-wrapper">
+              <i class="bi bi-person-vcard input-icon-left"></i>
+              <input type="text" id="inputDocumentoRecuperacion" class="form-control" name="dni" placeholder="Ingresa tu DNI o documento" autocomplete="off" maxlength="20" required />
+            </div>
+            <p class="form-feedback" data-feedback="dni"></p>
           </div>
           <div class="form-group">
-            <label for="inputRespuestaSeguridad">Respuesta de seguridad</label>
+            <label for="inputCorreoRecuperacion">Correo registrado</label>
             <div class="input-wrapper">
-              <i class="bi bi-key input-icon-left"></i>
-              <input type="text" id="inputRespuestaSeguridad" class="form-control" name="respuesta" placeholder="Escribe la respuesta" required data-type="text" />
+              <i class="bi bi-envelope input-icon-left"></i>
+              <input type="email" id="inputCorreoRecuperacion" class="form-control" name="correo" placeholder="Escribe el correo completo" autocomplete="email" maxlength="160" required />
             </div>
-            <p class="form-feedback" data-feedback="respuesta"></p>
+            <p class="form-feedback" data-feedback="correo"></p>
           </div>
           <div class="alert alert-danger d-none" id="alertVerificarIdentidad"></div>
           <div class="auth-actions-between">

@@ -27,12 +27,14 @@ import "../core/input-guard.js";
   const lblCorreoRecuperacion = document.getElementById(
     "lblCorreoRecuperacion",
   );
-  const lblPreguntaSeguridad = document.getElementById("lblPreguntaSeguridad");
   const formVerificarIdentidad = document.getElementById(
     "formVerificarIdentidad",
   );
-  const inputRespuestaSeguridad = document.getElementById(
-    "inputRespuestaSeguridad",
+  const inputDocumentoRecuperacion = document.getElementById(
+    "inputDocumentoRecuperacion",
+  );
+  const inputCorreoRecuperacion = document.getElementById(
+    "inputCorreoRecuperacion",
   );
   const btnVerificarIdentidad = document.getElementById(
     "btnVerificarIdentidad",
@@ -100,10 +102,14 @@ import "../core/input-guard.js";
     stepNuevaContrasena?.classList.toggle("d-none", stepNumber !== 3);
     stepperItems.forEach((item) => {
       const s = parseInt(item.dataset.step);
-      item.classList.toggle("active", s <= stepNumber);
+      const esActual = s === stepNumber;
+      item.classList.toggle("active", esActual);
+      item.classList.toggle("completed", s < stepNumber);
+      if (esActual) item.setAttribute("aria-current", "step");
+      else item.removeAttribute("aria-current");
     });
     if (stepNumber === 1) inputBuscarCuenta?.focus();
-    if (stepNumber === 2) inputRespuestaSeguridad?.focus();
+    if (stepNumber === 2) inputDocumentoRecuperacion?.focus();
     if (stepNumber === 3) inputNuevaContrasena?.focus();
   }
 
@@ -157,9 +163,8 @@ import "../core/input-guard.js";
       tokenRecuperacion = null;
       lblUsuarioRecuperacion.textContent = res.userData.usuario || "-";
       lblCorreoRecuperacion.textContent = res.userData.correo || "-";
-      lblPreguntaSeguridad.value =
-        res.userData.preguntaSeguridad || "No configurada";
-      inputRespuestaSeguridad.value = "";
+      inputDocumentoRecuperacion.value = "";
+      inputCorreoRecuperacion.value = "";
       setStep(2);
     } else {
       showAlert(
@@ -174,14 +179,19 @@ import "../core/input-guard.js";
     clearFeedback(formBuscarCuenta);
   });
 
-  btnVolverPaso1?.addEventListener("click", () => setStep(1));
+  btnVolverPaso1?.addEventListener("click", () => {
+    solicitudId = null;
+    tokenRecuperacion = null;
+    setStep(1);
+  });
 
   formVerificarIdentidad?.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearFeedback(formVerificarIdentidad);
     hideAlert(alertVerificarIdentidad);
 
-    const respuesta = inputRespuestaSeguridad?.value || "";
+    const documento = inputDocumentoRecuperacion?.value.trim() || "";
+    const correo = inputCorreoRecuperacion?.value.trim() || "";
     if (!solicitudId) {
       showAlert(
         alertVerificarIdentidad,
@@ -190,18 +200,37 @@ import "../core/input-guard.js";
       setStep(1);
       return;
     }
-    if (!respuesta.trim()) {
+    const documentoLimpio = documento.replace(/[^a-zA-Z0-9]/g, "");
+    if (documentoLimpio.length < 6) {
       setFieldFeedback(
-        inputRespuestaSeguridad,
-        "La respuesta de seguridad es obligatoria.",
+        inputDocumentoRecuperacion,
+        "Ingresa un documento de identidad válido.",
       );
+      inputDocumentoRecuperacion?.focus();
+      return;
+    }
+    if (!correo) {
+      setFieldFeedback(
+        inputCorreoRecuperacion,
+        "El correo registrado es obligatorio.",
+      );
+      inputCorreoRecuperacion?.focus();
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+      setFieldFeedback(
+        inputCorreoRecuperacion,
+        "Ingresa un correo electrónico válido.",
+      );
+      inputCorreoRecuperacion?.focus();
       return;
     }
 
     setBtnLoading(btnVerificarIdentidad, true);
-    const res = await authService.verificarRespuestaSeguridad(
+    const res = await authService.verificarIdentidadRecuperacion(
       solicitudId,
-      respuesta,
+      documento,
+      correo,
     );
     setBtnLoading(btnVerificarIdentidad, false);
     if (res.success) {
@@ -214,18 +243,20 @@ import "../core/input-guard.js";
     } else {
       showAlert(
         alertVerificarIdentidad,
-        res.message || "Respuesta incorrecta.",
+        res.message || "No se pudo verificar la identidad.",
       );
     }
   });
 
-  inputRespuestaSeguridad?.addEventListener("input", () => {
-    hideAlert(alertVerificarIdentidad);
-    clearFeedback(formVerificarIdentidad);
-  });
+  [inputDocumentoRecuperacion, inputCorreoRecuperacion].forEach((inp) =>
+    inp?.addEventListener("input", () => {
+      hideAlert(alertVerificarIdentidad);
+      clearFeedback(formVerificarIdentidad);
+    }),
+  );
 
   btnVolverPaso2?.addEventListener("click", () => {
-    // Al verificar se rota el token; volver a la pregunta exige una nueva solicitud.
+    // Al verificar se rota el token; volver a la verificación exige una nueva solicitud.
     tokenRecuperacion = null;
     solicitudId = null;
     setStep(1);

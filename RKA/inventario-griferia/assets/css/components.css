@@ -448,6 +448,11 @@
   transition: var(--transition-fast) ease;
 }
 
+/* Edge agrega su propio ojo al enfocar la contraseña; usamos solo el botón personalizado. */
+.input-wrapper.has-action input[type="password"]::-ms-reveal {
+  display: none;
+}
+
 .form-control::placeholder {
   color: var(--gray-500);
 }

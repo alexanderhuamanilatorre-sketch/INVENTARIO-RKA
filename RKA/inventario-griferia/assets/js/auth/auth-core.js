@@ -394,8 +394,8 @@ export class AuthService {
   }
 
   /**
-   * La recuperación se resuelve en el servidor: la pregunta y la respuesta
-   * viven en PostgreSQL y el cambio de contraseña actualiza el hash real.
+   * La recuperación se resuelve en el servidor: el documento y el correo se
+   * contrastan contra PostgreSQL y el cambio de contraseña actualiza el hash real.
    */
   async _solicitudRecuperacion(ruta, cuerpo) {
     try {
@@ -441,15 +441,15 @@ export class AuthService {
       userData: {
         usuario: res.usuario,
         correo: res.correo,
-        preguntaSeguridad: res.preguntaSeguridad,
       },
     };
   }
 
-  verificarRespuestaSeguridad(solicitudId, respuesta) {
+  verificarIdentidadRecuperacion(solicitudId, dni, correo) {
     return this._solicitudRecuperacion("/api/usuarios/recuperacion/verificar", {
       solicitudId,
-      respuesta,
+      dni,
+      correo,
     });
   }
 
